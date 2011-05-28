@@ -26,7 +26,6 @@ namespace Ifschleife\Bundle\AutowiringBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-
 use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Compiler\AutowiringCompilerPass;
 
 /**
@@ -36,10 +35,11 @@ use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Compiler\AutowiringCo
  */
 class AutowiringBundle extends Bundle
 {
-	public function build(ContainerBuilder $container)
+
+    public function build(ContainerBuilder $container)
     {
         parent::build($container);
-		
-		$container->addCompilerPass(new AutowiringCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+
+        $container->addCompilerPass(new AutowiringCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 }

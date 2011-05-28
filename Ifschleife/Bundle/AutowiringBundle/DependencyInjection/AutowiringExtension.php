@@ -39,26 +39,26 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class AutowiringExtension extends Extension
 {
-	public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
-		$processor = new Processor();
+        $processor = new Processor();
 
-		$configuration = new Configuration($container->getParameter('kernel.debug'));
-		
-		$config = $processor->processConfiguration($configuration, $configs);
-		
-		if ( true === $config['enabled'])
-		{
-			$this->loadAutowiring($config, $container);
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+
+        $config = $processor->processConfiguration($configuration, $configs);
+
+        if (true === $config['enabled'])
+        {
+            $this->loadAutowiring($config, $container);
         }
     }
-	
-	public function loadAutowiring(array $configs, ContainerBuilder $container)
-	{
-		$loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
-		$loader->load('autowiring.xml');
-	}
+    public function loadAutowiring(array $configs, ContainerBuilder $container)
+    {
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+
+        $loader->load('autowiring.xml');
+    }
 
     /**
      * Returns the base path for the XSD files.
@@ -67,7 +67,7 @@ class AutowiringExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return __DIR__.'/../Resources/config/schema';
+        return __DIR__ . '/../Resources/config/schema';
     }
 
     public function getNamespace()

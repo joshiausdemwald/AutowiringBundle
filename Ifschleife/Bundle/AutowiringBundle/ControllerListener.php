@@ -35,23 +35,23 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\Configurator;
  */
 class ControllerListener
 {
-	/**
-	 * @var Configurator
-	 */
-	protected $configurator;
+    /**
+     * @var Configurator
+     */
+    protected $configurator;
 
-	/**
-	 * @param Configurator $configurator 
-	 */
+    /**
+     * @param Configurator $configurator 
+     */
     public function __construct(Configurator $configurator)
     {
-		$this->configurator = $configurator;
+        $this->configurator = $configurator;
     }
-	
-	/**
-	 *
-	 * @param FilterControllerEvent $event 
-	 */
+
+    /**
+     *
+     * @param FilterControllerEvent $event 
+     */
     public function onCoreController(FilterControllerEvent $event)
     {
         $controller = $event->getController();

@@ -34,19 +34,19 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-	private $debug;
+    private $debug;
 
     /**
      * Constructor
      *
      * @param Boolean $debug Whether to use the debug mode
      */
-    public function  __construct($debug)
+    public function __construct($debug)
     {
         $this->debug = (Boolean) $debug;
     }
-	
-	/**
+
+    /**
      * Generates the configuration tree builder.
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
@@ -57,21 +57,21 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('autowiring');
 
         $rootNode
-			->children()
-				->booleanNode('enabled')
-					->defaultValue(true)
-					->end()
-				->booleanNode('resolve_by_signature')
-					->defaultValue(true)
-					->end()
-				->booleanNode('resolve_by_property_name')
-					->defaultValue(true)
-					->end()
-				->scalarNode('service_property_suffix')
-					->defaultValue('Service')
-					->end()
-				->end()
-			->end();
+                ->children()
+                ->booleanNode('enabled')
+                ->defaultValue(true)
+                ->end()
+                ->booleanNode('resolve_by_signature')
+                ->defaultValue(true)
+                ->end()
+                ->booleanNode('resolve_by_property_name')
+                ->defaultValue(true)
+                ->end()
+                ->scalarNode('service_property_suffix')
+                ->defaultValue('Service')
+                ->end()
+                ->end()
+                ->end();
         return $treeBuilder;
     }
 }

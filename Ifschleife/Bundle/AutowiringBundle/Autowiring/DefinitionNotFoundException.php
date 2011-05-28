@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
  * SOFTWARE.
  */
+
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
@@ -29,4 +30,7 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
  *
  * @author joshi
  */
-class DefinitionNotFoundException extends ServiceResolverException { }
+class DefinitionNotFoundException extends ServiceResolverException
+{
+    
+}

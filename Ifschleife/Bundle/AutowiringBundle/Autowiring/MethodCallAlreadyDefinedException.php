@@ -30,4 +30,7 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
  *
  * @author joshi
  */
-class MethodCallAlreadyDefinedException extends ServiceResolverException { }
+class MethodCallAlreadyDefinedException extends ServiceResolverException
+{
+    
+}

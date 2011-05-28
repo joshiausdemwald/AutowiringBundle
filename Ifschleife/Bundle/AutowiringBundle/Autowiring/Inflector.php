@@ -30,20 +30,21 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
  */
 class Inflector
 {
-	/**
+
+    /**
      * Converts a camelized word into the format of a generic service id. 
-	 * Converts 'SwiftmailerService' to 'swiftmailer', 
-	 * 'doctrineEntity_managerService' to 'doctrine.entity_manager'.
+     * Converts 'SwiftmailerService' to 'swiftmailer', 
+     * 'doctrineEntity_managerService' to 'doctrine.entity_manager'.
      * Pattern stolen from doctrine inflector.
-	 * (@copyright Konsta Vesterinen <kvesteri@cc.hut.fi> @copyright Jonathan H. Wage <jonwage@gmail.com>)
-	 * 
+     * (@copyright Konsta Vesterinen <kvesteri@cc.hut.fi> @copyright Jonathan H. Wage <jonwage@gmail.com>)
+     * 
      * @param  string $word  Word to transform
      * @return string $word  "serviceIdzed" word
      */
-	public static function propertyName2ServiceId($propertyName)
-	{
-		$camelized = preg_replace('#Service$#', '', $propertyName);
-					
+    public static function propertyName2ServiceId($propertyName)
+    {
+        $camelized = preg_replace('#Service$#', '', $propertyName);
+
         return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '.$1', $camelized));
-	}
+    }
 }

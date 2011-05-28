@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
  * SOFTWARE.
  */
+
 namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 
 use Doctrine\Common\Annotations\Annotation;
@@ -31,18 +32,18 @@ use Doctrine\Common\Annotations\Annotation;
  */
 class Inject extends Annotation
 {
-	/**
-	 * Returns the DI-Service ID hints as a array list.
-	 * 
-	 * @return array
-	 */
-	public function getHints()
-	{
-		if(null === $this->value)
-		{
-			return null;
-		}
-		
-		return (array)$this->value;
-	}
+    /**
+     * Returns the DI-Service ID hints as a array list.
+     * 
+     * @return array
+     */
+    public function getHints()
+    {
+        if (null === $this->value)
+        {
+            return null;
+        }
+
+        return (array) $this->value;
+    }
 }

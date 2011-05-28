@@ -41,11 +41,11 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolver;
  */
 class AutowiringCompilerPass implements CompilerPassInterface
 {
-	public function process(ContainerBuilder $container)
+
+    public function process(ContainerBuilder $container)
     {
-		$serviceResolver = new ServiceResolver($container);
-		
-		$serviceResolver->initialize();
-		
+        $serviceResolver = new ServiceResolver($container);
+
+        $serviceResolver->initialize();
     }
 }

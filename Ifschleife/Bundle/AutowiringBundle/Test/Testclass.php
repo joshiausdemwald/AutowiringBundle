@@ -3,6 +3,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 namespace Ifschleife\Bundle\AutowiringBundle\Test;
 
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
@@ -14,17 +15,16 @@ use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
  */
 class Testclass extends ParentTestclass
 {
-	private $testsvc;
-	
-	private $ifschleifeAutowiringTestserviceService;
-	
-	/**
+    private $testsvc;
+    private $ifschleifeAutowiringTestserviceService;
+
+    /**
      *
-	 * @param Testservice $testservice 
-	 * @Inject
-	 */
-	public function __construct(Testservice $testservice)
-	{
-		$this->testsvc = $testservice;
-	}
+     * @param Testservice $testservice 
+     * @Inject
+     */
+    public function __construct(Testservice $testservice)
+    {
+        $this->testsvc = $testservice;
+    }
 }

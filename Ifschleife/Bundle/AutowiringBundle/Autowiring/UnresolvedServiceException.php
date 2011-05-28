@@ -30,4 +30,7 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
  *
  * @author joshi
  */
-class UnresolvedServiceException extends ServiceResolverException { }
+class UnresolvedServiceException extends ServiceResolverException
+{
+    
+}
