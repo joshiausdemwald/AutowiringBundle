@@ -203,6 +203,7 @@ class ServiceBuilder
             
             $service_id = $annotation->getId();
             
+            // Regards definitions, aliases and concrete getters named getXYZ()
             if($this->container->has($service_id))
             {
                 throw new DuplicateServiceIdException(sprintf('A service named "%s" already exists in the DIC.', $service_id));

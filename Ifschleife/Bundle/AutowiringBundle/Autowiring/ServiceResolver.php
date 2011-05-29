@@ -67,29 +67,9 @@ class ServiceResolver
     private $aliasMap;
     
     /**
-     * @var array<Definition>
-     */
-    private $definitions;
-    
-    /**
-     * @var array<Alias>
-     */
-    private $aliases;
-    
-    /**
-     * @var array
-     */
-    private $serviceIds;
-    
-    /**
      * @var array<ReflectionClass>
      */
     private $classes;
-    
-    /**
-     * @var ParameterBag
-     */
-    private $parameters;
     
     /**
      * @var array<String, Parameter>
@@ -127,14 +107,6 @@ class ServiceResolver
      */
     public function initialize()
     {
-        $this->definitions = $this->container->getDefinitions();
-
-        $this->aliases = $this->container->getAliases();
-
-        $this->serviceIds = $this->container->getServiceIds();
-
-        $this->parameters = $this->container->getParameterBag();
-
         $this->classMap = array();
 
         $this->aliasMap = array();
@@ -195,7 +167,28 @@ class ServiceResolver
         }
         return new Reference($service_id, $invalidBehavior, $strict);
     }
-
+    
+    /**
+     * Returns a single parameter which can be a concrete value (string) or
+     * a placeholder like "%service.x.y.class_name%". If a placeholder is given,
+     * it´s first matching value will be returned.
+     * 
+     * @see resolveClassname()
+     * @see resolveParameter()
+     * @param string $callout: The callout string.
+     *
+     * @return mixed $parameter: The parameter or null if callout does not match to any.
+     */
+    public function getParameter($callout)
+    {
+        if (isset($this->parametersMap[$callout]))
+        {
+            return $this->parametersMap[$callout];
+        }
+        
+        return $this->resolveParameter($callout);
+    }
+    
     /**
      * Resolves a single parameter which can be a concrete value (string) or a
      * placeholder like "%service.x.y.class_name%". If a placeholder is given,
@@ -206,14 +199,9 @@ class ServiceResolver
      * 
      * @return mixed $parameter: The parameter or null if callout does not match to anyone.
      */
-    public function resolveParameter($callout)
+    private function resolveParameter($callout)
     {
-        if (isset($this->parametersMap[$callout]))
-        {
-            return $this->parametersMap[$callout];
-        }
-
-        $this->parametersMap[$callout] = $retVal = $this->parameters->resolveValue($callout);
+        $this->parametersMap[$callout] = $retVal = $this->container->getParameterBag()->resolveValue($callout);
 
         return $retVal;
     }
@@ -227,17 +215,27 @@ class ServiceResolver
     private function extendDefinitions()
     {
         // ANALYZE SERVICES
-        foreach ($this->classMap AS $classname => $id)
+        foreach ($this->classes AS $class)
         {
-            $definition = $this->getDefinition($id);
+            $service_id = $this->classMap[$class->getName()];
+            
+            // PRE-CHECK, IF @INJECT IS USED WITHIN THE CLASS, TO SAVE CPU TIME
+            $filename = $class->getFilename();
+            
+            if(preg_match('#\B/\\*.*?@var.+?\\*/\s*(?:class|var|private|public|protected|function)\s+(.+?)\b#s', file_get_contents($filename), $matches))
+            {
+                // AMBIGUOUS CLASSNAMES ARE NOT ALLOWED TO BE PROCESSED ...
+                if(false !== $service_id)
+                {
+                    $definition = $this->getDefinition($service_id);
 
-            $class = $this->classes[$id];
+                    $this->extendConstructorInjections($definition, $class);
 
-            $this->extendConstructorInjections($definition, $class);
+                    $this->extendMethodCalls($definition, $class);
 
-            $this->extendMethodCalls($definition, $class);
-
-            $this->extendPropertyInjections($definition, $class);
+                    $this->extendPropertyInjections($definition, $class);
+                }
+            }
         }
     }
 
@@ -421,7 +419,7 @@ class ServiceResolver
                 $di_hint = $di_hints[$i];
 
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
-                if (is_string($di_hint) && $this->parameters->has($di_hint))
+                if (is_string($di_hint) && $this->container->hasParameter($di_hint))
                 {
                     $arguments[] = new Parameter($di_hint);
                 }
@@ -531,13 +529,20 @@ class ServiceResolver
      */
     private function resolveServices()
     {
-        foreach ($this->definitions AS $id => $definition)
+        foreach ($this->container->getDefinitions() AS $id => $definition)
         {
-            if (!$definition->isAbstract() && $definition->isPublic())
+            if ( ! $definition->isSynthetic() && ! $definition->isAbstract() && $definition->isPublic())
             {
+                // transform %service_class% to concrete class, regarding parent
+                // definitions.
                 $classname = $this->resolveClassname($definition);
-
-                if (null !== $classname && !array_key_exists($classname, $this->classMap))
+                
+                // AMBIGUOUS SERVICE, FLAG AS INVALID FOR LOOKUP
+                if(array_key_exists($classname, $this->classMap))
+                {
+                    $this->classMap[$classname] = false;
+                }
+                else
                 {
                     $this->classes[$id] = new \ReflectionClass($classname);
 
@@ -555,18 +560,31 @@ class ServiceResolver
      */
     private function resolveAliases()
     {
-        foreach ($this->aliases AS $name => $alias_definition)
+        foreach ($this->container->getAliases() AS $name => $alias_definition)
         {
             if ($alias_definition->isPublic())
             {
                 /* @var $alias_definition \Symfony\Component\DependencyInjection\Alias */
                 $target_definition = $this->container->findDefinition($name);
-
-                if (null !== $target_definition)
+                
+                if (null === $target_definition)
                 {
+                    throw new DefinitionNotFoundException(sprintf('Service definition for alias "%s" could not be resolved.', $name));
+                }
+                
+                // SYNTHETIC DEFINITIONS HAS NO CLASSNAME
+                if( ! $target_definition->isSynthetic())
+                {
+                    // transform %service_class% to concrete class, regarding parent
+                    // definitions.
                     $classname = $this->resolveClassname($target_definition);
 
-                    if (!array_key_exists($classname, $this->aliasMap))
+                    // AMBIGUOUS SERVICE, FLAG AS INVALID FOR LOOKUP
+                    if (array_key_exists($classname, $this->aliasMap))
+                    {
+                        $this->aliasMap[$classname] = false;
+                    }
+                    else
                     {
                         $this->aliasMap[$classname] = $name;
                     }
@@ -589,7 +607,7 @@ class ServiceResolver
     private function resolveClassname(Definition $definition)
     {
         $classname = $definition->getClass();
-
+        
         // MAY HAVE PARENT DEF
         if (null === $classname)
         {
@@ -616,8 +634,9 @@ class ServiceResolver
                 return $this->resolveClassname($factory_class);
             }
         }
-
-        return $this->resolveParameter($classname);
+        
+        // Returns the concrete classname instead of e.g. "%service_class%"
+        return $this->getParameter($classname);
     }
 
     /**
@@ -628,7 +647,7 @@ class ServiceResolver
      */
     private function getDefinition($id)
     {
-        return isset($this->definitions[$id]) ? $this->definitions[$id] : null;
+        return $this->container->hasDefinition($id) ? $this->container->getDefinition($id) : null;
     }
     
     /**
