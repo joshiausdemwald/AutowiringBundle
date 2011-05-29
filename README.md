@@ -4,24 +4,24 @@ README
 What is Autowiring Bundle?
 -----------------
 
-Autowiring Bundle is a Symfony 2 bundle that enables autowiring for services
+*Autowiring Bundle* is a *Symfony 2* bundle that enables autowiring for services
 as well as any container aware class (more precisely: any class).
 
-NOTE: This bundle is in a very early stadium. There is 0% code coverage, no 
+*NOTE*: This bundle is in a very early stadium. There is 0% code coverage, no 
 guarantee that it`ll work at any circumstances and one advice:
 
-DON´T EVER USE THIS BUNDLE IN PRODUCTION ENVIRONMENTS UNTIL THIS WARNING HAS 
-DISAPPEARED!
+*DON´T EVER USE THIS BUNDLE IN PRODUCTION ENVIRONMENTS UNTIL THIS WARNING HAS 
+DISAPPEARED!*
 
-The bundle is an experiment (that´s why it´s called "experiment") to see what
+The bundle is an _experiment_ (that´s why it´s called "experiment") to see what
 may be archived by DI-Autowiring, to determine which features are "good", and 
 which are "bad" in the sense of "too complex", "too magically" or simply 
 redundant.
 
-I would love to get comments on my work!
+I would love to get comments on my work! *Don't beeing to be upfront*!
 
 
-Autowiring bundle consists of a container compiler pass that 
+Autowiring bundle consists of a container compiler pass that
 
 1.  automatically enables preselected classes for beeing defined as DI-
     Services by using a simple annotation syntax. This is a full featured 
