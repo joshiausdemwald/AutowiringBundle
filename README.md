@@ -13,6 +13,11 @@ guarantee that it`ll work at any circumstances and one advice:
 *DON´T EVER USE THIS BUNDLE IN PRODUCTION ENVIRONMENTS UNTIL THIS WARNING HAS 
 DISAPPEARED!*
 
+This bundle does not yet claim to be a masterpiece in application design, nor
+it is (yet) configurable as promised in the small documentation below. It really
+must be understood as a case-study for determining use-cases and solutions
+to them.
+
 The bundle is an _experiment_ (that´s why it´s called "experiment") to see what
 may be achieved by DI-Autowiring, to determine which features are "good", and 
 which are "bad" in the sense of "too complex", "too magically" or simply 
