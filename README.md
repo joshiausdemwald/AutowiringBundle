@@ -28,7 +28,7 @@ Autowiring bundle consists of a container compiler pass that
     alternative to the common way defining services by XML, Yaml or plain 
     PHP files.
 
-    All services are defined by using a class annotation named @Service
+    All services are defined by using a class annotation named "@Service".
 
 2.  automatically wires (injects) dependencies to existing services as well 
     as annotation-defined services. Supported is
@@ -43,17 +43,17 @@ Autowiring bundle consists of a container compiler pass that
 
 Additionally, dependencies can be wired by naming conventions. Naming 
 conventions are supported for property injection only. Each property that ends 
-up with "Service" are resolved by transforming the variable prefix into a valid
+up with "Service" is resolved by transforming the variable prefix into a valid
 service identifier. For example,
 
     private $doctrineEntity_managerService;
 
-Will be transformed into "doctrine.entity_manager" and automatically resolved
+will be transformed into "doctrine.entity_manager" and automatically resolved
 by using the symfony´s DIC property injection feature.
 
 Wiring by naming conventions is slightly magical, so you may want to disable
-this feature (which is possible) or explicetly "type-hint" the definition-type
-by using the @Inject-annotation:
+this feature (which is possible) or explicitly "type-hint" the definition-type
+by using the "@Inject"-annotation:
         
     /**
      * @Inject("doctrine.entity_manager")
@@ -76,7 +76,7 @@ expected types by analyzing all services in the DIC. For example, a method like
 will automatically gain a addMethodCall() in the DIC that´ll be constructed by
 the ContainerBuilder.
 
-Ambigous services that share the same classname are excluded from this feature,
+Ambiguous services that share the same classname are excluded from this feature,
 so you hopefully won't suffer from magic tricks that are hard to debug.
 
 In the case a service is ambiguous or you want to explicetly define the
@@ -104,7 +104,7 @@ This also works for multiple arguments too, of course:
         $this->mailer = $mailer
     }
 
-An alternative Syntax is provided to map dependencies on argument names:
+An alternative Syntax is provided to map dependencies to argument names:
 
     /**
      * @Inject(mailer="my.mighty.mailer", em="doctrine.entity_manager")
@@ -147,7 +147,7 @@ Annotations for fine-tuning the dependencies
 
 You may use the @Optional and @Strict dependencies to control how the DIC deals
 with them. Internally, @Optional controls exception handling when the service
-does not exists and @Strict sets how the service reference is validated by the
+does not exist and @Strict sets how the service reference is validated by the
 DIC.
 
 Example:
@@ -182,7 +182,7 @@ or:
         $this->mailer = $mailer
     }
 
-Per default, all autowired dependencies are NOT optional (mandatory) and are
+By default, all autowired dependencies are NOT optional (mandatory) and are
 validated Strict.
 
 Annotations for defining services
@@ -190,9 +190,10 @@ Annotations for defining services
 
 This is an extremely useful feature in combination with the autowiring stuff
 explained above. All you have to do is to define which classes are parsed
-at the ContainerBuilder warmup (this happens once, than the DIC is persisted
+at the ContainerBuilder warmup (this happens once, then the DIC is persisted
 as a concrete php class with simple getter and setter method in symfony´s cache
-directory).
+directory. The takes a really long time at this early state of development,
+sure that there it space for optimization.)
 
 You define services by annotating classes with the @Service annotation. As an
 example i modified the Acme Welcome-controller of the symfony 2 standard 
@@ -232,13 +233,13 @@ Acme-Bundle is only enabled in DEV-mode):
         pattern:  /
         defaults: { _controller: acme.demo.controller.welcome_controller:indexAction }
 
-This route is a not a "ordinary" controller/action definition but a 
+This route is not an "ordinary" controller/action definition but a 
 "service-route" which means that it points to a controller that has been defined
 as a DIC service.
 
-Open the Welcome-Page in your browser (it´s the demo´s homepage). Thats it.
+Open the Welcome-Page in your browser (it´s the demo´s homepage). That´s it.
 
-Comments very appreciated! 
+Comments are very appreciated! 
            
 
 Requirements
@@ -258,5 +259,3 @@ Then install this bundle by cloning it into your /src folder. Register the
 that enable the Bundle in your AppKernel:
 
         new Ifschleife\Bundle\AutowiringBundle\AutowiringBundle()
-
-Thats it.
