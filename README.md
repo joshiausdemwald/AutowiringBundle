@@ -14,11 +14,11 @@ guarantee that it`ll work at any circumstances and one advice:
 DISAPPEARED!*
 
 The bundle is an _experiment_ (that´s why it´s called "experiment") to see what
-may be archived by DI-Autowiring, to determine which features are "good", and 
+may be achieved by DI-Autowiring, to determine which features are "good", and 
 which are "bad" in the sense of "too complex", "too magically" or simply 
 redundant.
 
-I would love to get comments on my work! *Don't beeing to be upfront*!
+I would love to get comments on my work! *Don't hesitate beeing upfront*!
 
 
 Autowiring bundle consists of a container compiler pass that
