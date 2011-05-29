@@ -7,6 +7,8 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Test;
 
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
+use Ifschleife\Bundle\AutowiringBundle\Annotations\Optional;
+use Ifschleife\Bundle\AutowiringBundle\Annotations\Strict;
 
 /**
  * Description of Testclass
@@ -21,6 +23,7 @@ class Testclass extends ParentTestclass
     /**
      *
      * @param Testservice $testservice 
+     * @Optional
      * @Inject
      */
     public function __construct(Testservice $testservice)

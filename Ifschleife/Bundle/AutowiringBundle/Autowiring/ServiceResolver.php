@@ -46,6 +46,10 @@ use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
  */
 class ServiceResolver
 {
+    const ANNOTATION_INJECT     = 'Ifschleife\Bundle\AutowiringBundle\Annotations\Inject';
+    const ANNOTATION_OPTIONAL   = 'Ifschleife\Bundle\AutowiringBundle\Annotations\Optional';
+    const ANNOTATION_STRICT     = 'Ifschleife\Bundle\AutowiringBundle\Annotations\Strict';
+    
     /**
      * @var ContainerBuilder
      */
@@ -96,11 +100,11 @@ class ServiceResolver
      * 
      * @param ContainerBuilder $container: The container builder
      */
-    public function __construct(ContainerBuilder $container)
+    public function __construct(ContainerBuilder $container, \Doctrine\Common\Annotations\AnnotationReader $reader = null)
     {
         $this->container = $container;
 
-        $this->reader = new \Doctrine\Common\Annotations\AnnotationReader();
+        $this->reader = null === $reader ? new \Doctrine\Common\Annotations\AnnotationReader() : $reader;
     }
 
     public function initialize()
@@ -216,49 +220,55 @@ class ServiceResolver
 
         return $id;
     }
-
+    
+    /**
+     * Adds parameters to the current dispatched service definition configured
+     * by annotations.
+     *
+     * @param Definition $definition
+     * @param \ReflectionClass $class 
+     */
     private function extendConstructorInjections(Definition $definition, \ReflectionClass $class)
-    {
+    {   
         $constructor = $class->getConstructor();
 
-        if (null !== $constructor && null !== ($annotation = $this->getMethodAnnotation($constructor)))
+        if (null !== $constructor)
         {
-            $arguments = $this->guessArgumentsForMethodSignature($constructor, $class, $annotation->getHints());
-
-            if (count($definition->getArguments()) > 0)
+            $annotations = $this->reader->getMethodAnnotations($constructor);
+            
+            if(array_key_exists(self::ANNOTATION_INJECT, $annotations))
             {
-                throw new ArgumentsAlreadyDefinedException(sprintf('Constructor "%s()" on class "%s" has already been injected by the dependency injection container or extension configuration. Please check your container´s config files.', $method->getName(), $class->getName()));
-            }
+                $arguments = $this->guessArgumentsForMethodSignature($constructor, $class, $annotations);
 
-            $definition->setArguments($arguments);
+                if (count($definition->getArguments()) > 0)
+                {
+                    throw new ArgumentsAlreadyDefinedException(sprintf('Constructor "%s()" on class "%s" has already been injected by the dependency injection container or extension configuration. Please check your container´s config files.', $method->getName(), $class->getName()));
+                }
+
+                $definition->setArguments($arguments);
+            }
         }
     }
 
     /**
+     * Adds property injections to the DIC based on annotations.
      * 
-     * @param type $definition
-     * @param type $class 
+     * @param Definition $definition
+     * @param \ReflectionClass $class 
      */
     private function extendPropertyInjections(Definition $definition, \ReflectionClass $class)
     {
         foreach ($class->getProperties() AS $property)
         {
+            $annotations = $this->reader->getPropertyAnnotations($property);
+            
+            $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations);
+            $is_strict   = array_key_exists(self::ANNOTATION_STRICT, $annotations);
+            
             /* @var $property \ReflectionProperty */
-            if (null === ($annotation = $this->getPropertyAnnotation($property)))
+            if (array_key_exists(self::ANNOTATION_INJECT, $annotations))
             {
-                if ('Service' === substr($property->getName(), -7, 7))
-                {
-                    $service_definition = $this->getDefinition($service_id = Inflector::propertyName2ServiceId($property->getName()));
-
-                    if (null !== $service_definition)
-                    {
-                        $definition->setProperty($property->getName(), new Reference($service_id, Container::EXCEPTION_ON_INVALID_REFERENCE, true));
-                    }
-                }
-            }
-            else
-            {
-                $di_hints = $annotation->getHints();
+                $di_hints = $annotations[self::ANNOTATION_INJECT]->getHints();
 
                 if (null === $di_hints || null === ($di_hint = array_pop($di_hints)))
                 {
@@ -280,17 +290,39 @@ class ServiceResolver
 
                 $definition->setProperty($property->getName(), $property);
             }
+            
+            // GUESS BY NAMING CONVENTION
+            else
+            {
+                if ('Service' === substr($property->getName(), -7, 7))
+                {
+                    $service_definition = $this->getDefinition($service_id = Inflector::propertyName2ServiceId($property->getName()));
+
+                    if (null !== $service_definition)
+                    {
+                        $definition->setProperty($property->getName(), new Reference($service_id, Container::EXCEPTION_ON_INVALID_REFERENCE, true));
+                    }
+                }
+            }
         }
     }
-
+    
+    /**
+     * Adds method calls to the DIC configured by class annotations.
+     * 
+     * @param Definition $definition
+     * @param \ReflectionClass $class 
+     */
     private function extendMethodCalls(Definition $definition, \ReflectionClass $class)
     {
         foreach ($class->getMethods() AS $method)
         {
+            $annotations = $this->reader->getMethodAnnotations($method);
+            
             /* @var $method \ReflectionMethod */
-            if (null !== ($annotation = $this->getMethodAnnotation($method)))
+            if (array_key_exists(self::ANNOTATION_INJECT, $annotations))
             {
-                $arguments = $this->guessArgumentsForMethodSignature($method, $class, $annotation->getHints());
+                $arguments = $this->guessArgumentsForMethodSignature($method, $class, $annotations);
 
                 if ($definition->hasMethodCall($method->getName()))
                 {
@@ -305,20 +337,29 @@ class ServiceResolver
     }
 
     /**
-     *
+     * Guesses arguments size and types by analyzing the to-inject method
+     * signature. The $di_hints array contains information about primitive
+     * types (may be di parameters or primitive values) and complex types
+     * that e.g. are defined ambiguous in the DIC.
+     * 
      * @param \ReflectionMethod $method
      * @param \ReflectionClass $class
      * @param array $di_hints
      * @return array $arguments
      */
-    private function guessArgumentsForMethodSignature(\ReflectionMethod $method, \ReflectionClass $class, array $di_hints = null)
+    private function guessArgumentsForMethodSignature(\ReflectionMethod $method, \ReflectionClass $class, array $annotations)
     {
         $signature = $method->getParameters();
 
         $signature_size = count($signature);
-
+        
+        $di_hints = $annotations[self::ANNOTATION_INJECT]->getHints();
+        
         $di_hints = $di_hints === null ? null : $this->mapDIHints($signature, $di_hints);
-
+        
+        $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations);
+        $is_strict   = array_key_exists(self::ANNOTATION_STRICT, $annotations);
+        
         $arguments = array();
 
         for ($i = 0; $i < $signature_size; $i++)
