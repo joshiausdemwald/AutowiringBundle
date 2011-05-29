@@ -23,30 +23,30 @@ I would love to get comments on my work!
 
 Autowiring bundle consists of a container compiler pass that 
 
-1.      automatically enables preselected classes for beeing defined as DI-
-        Services by using a simple annotation syntax. This is a full featured 
-        alternative to the common way defining services by XML, Yaml or plain 
-        PHP files.
+1.  automatically enables preselected classes for beeing defined as DI-
+    Services by using a simple annotation syntax. This is a full featured 
+    alternative to the common way defining services by XML, Yaml or plain 
+    PHP files.
 
-        All services are defined by using a class annotation named @Service
+    All services are defined by using a class annotation named @Service
 
-2.      automatically wires (injects) dependencies to existing services as well 
-        as annotation-defined services. Supported is
+2.  automatically wires (injects) dependencies to existing services as well 
+    as annotation-defined services. Supported is
         
-            a.      Constructor injection
-            
-            b.      Setter injection
+    a.  Constructor injection
 
-            c.      Property injection
+    b.  Setter injection
+
+    c.  Property injection
          
-        All dependencies are defined by using a class annotation named @Inject
+    All dependencies are defined by using a class annotation named @Inject
 
 Additionally, dependencies can be wired by naming conventions. Naming 
 conventions are supported for property injection only. Each property that ends 
 up with "Service" are resolved by transforming the variable prefix into a valid
 service identifier. For example,
 
-        private $doctrineEntity_managerService;
+    private $doctrineEntity_managerService;
 
 Will be transformed into "doctrine.entity_manager" and automatically resolved
 by using the symfony´s DIC property injection feature.
@@ -55,23 +55,23 @@ Wiring by naming conventions is slightly magical, so you may want to disable
 this feature (which is possible) or explicetly "type-hint" the definition-type
 by using the @Inject-annotation:
         
-        /**
-         * @Inject("doctrine.entity_manager")
-         */
-        private $entityManager;
+    /**
+     * @Inject("doctrine.entity_manager")
+     */
+    private $entityManager;
 
 Dependencies may even be wired by introspection (the only aspect of DI that
 supports introspection-wiring is setter-injection). If a instance method has a 
 qualified signature with type-hints in it, the bundle tries to resolve the 
 expected types by analyzing all services in the DIC. For example, a method like
 
-        /**
-         * @Inject
-         */
-        public function setEntityManager(\Doctrine\ORM\EntityManager $em)
-        {
-            $this->em = $em;
-        }
+    /**
+     * @Inject
+     */
+    public function setEntityManager(\Doctrine\ORM\EntityManager $em)
+    {
+        $this->em = $em;
+    }
 
 will automatically gain a addMethodCall() in the DIC that´ll be constructed by
 the ContainerBuilder.
@@ -82,41 +82,41 @@ so you hopefully won't suffer from magic tricks that are hard to debug.
 In the case a service is ambiguous or you want to explicetly define the
 dependency, use the @Inject annotation:
 
-        /**
-         * @Inject("doctrine.entity_manager")
-         */
-        public function setEntityManager(\Doctrine\ORM\EntityManager $em)
-        {
-            $this->em = $em;
-        }
+    /**
+     * @Inject("doctrine.entity_manager")
+     */
+    public function setEntityManager(\Doctrine\ORM\EntityManager $em)
+    {
+        $this->em = $em;
+    }
 
 This also works for multiple arguments too, of course:
 
-        /**
-         * @Inject({"doctrine.entity_manager", "my.mighty.mailer"})
-         */
-        public function setEntityManager(
-                         \Doctrine\ORM\EntityManager $em, 
-                         \Mailer $mailer, 
-        ) {
-            $this->em = $em;
-            
-            $this->mailer = $mailer
-        }
+    /**
+     * @Inject({"doctrine.entity_manager", "my.mighty.mailer"})
+     */
+    public function setEntityManager(
+                     \Doctrine\ORM\EntityManager $em, 
+                     \Mailer $mailer, 
+    ) {
+        $this->em = $em;
+
+        $this->mailer = $mailer
+    }
 
 An alternative Syntax is provided to map dependencies on argument names:
 
-        /**
-         * @Inject(mailer="my.mighty.mailer", em="doctrine.entity_manager")
-         */
-        public function setEntityManager(
-                         \Doctrine\ORM\EntityManager $em, 
-                         \Mailer $mailer, 
-        ) {
-            $this->em = $em;
-            
-            $this->mailer = $mailer
-        }
+    /**
+     * @Inject(mailer="my.mighty.mailer", em="doctrine.entity_manager")
+     */
+    public function setEntityManager(
+                     \Doctrine\ORM\EntityManager $em, 
+                     \Mailer $mailer, 
+    ) {
+        $this->em = $em;
+
+        $this->mailer = $mailer
+    }
 
 The order of the arguments provided is not important when you use named 
 @Inject hints!
@@ -124,17 +124,17 @@ The order of the arguments provided is not important when you use named
 You may even leave some arguments blank if they can be resolved by the type-
 lookup resolver:
 
-        /**
-         * @Inject(mailer="my.mighty.mailer")
-         */
-        public function setEntityManager(
-                         \Doctrine\ORM\EntityManager $em, 
-                         \Mailer $mailer, 
-        ) {
-            $this->em = $em;
+    /**
+     * @Inject(mailer="my.mighty.mailer")
+     */
+    public function setEntityManager(
+                     \Doctrine\ORM\EntityManager $em, 
+                     \Mailer $mailer, 
+    ) {
+        $this->em = $em;
 
-            $this->mailer = $mailer
-        }
+        $this->mailer = $mailer
+    }
 
 The bundle should be smart enough to resolve the not explicitly defined
 dependencies by analyzing the method signature.
@@ -152,35 +152,35 @@ DIC.
 
 Example:
         
-        /**
-         * @Strict(false)
-         * @Optional
-         * @Inject("my.mighty.mailer")
-         */
-        public function setEntityManager(
-                         \Doctrine\ORM\EntityManager $em, 
-                         \Mailer $mailer, 
-        ) {
-            $this->em = $em;
+    /**
+     * @Strict(false)
+     * @Optional
+     * @Inject("my.mighty.mailer")
+     */
+    public function setEntityManager(
+                     \Doctrine\ORM\EntityManager $em, 
+                     \Mailer $mailer, 
+    ) {
+        $this->em = $em;
 
-            $this->mailer = $mailer
-        }
+        $this->mailer = $mailer
+    }
 
 or:
     
-        /**
-         * @Strict
-         * @Optional(false)
-         * @Inject("my.mighty.mailer")
-         */
-        public function setEntityManager(
-                         \Doctrine\ORM\EntityManager $em, 
-                         \Mailer $mailer, 
-        ) {
-            $this->em = $em;
+    /**
+     * @Strict
+     * @Optional(false)
+     * @Inject("my.mighty.mailer")
+     */
+    public function setEntityManager(
+                     \Doctrine\ORM\EntityManager $em, 
+                     \Mailer $mailer, 
+    ) {
+        $this->em = $em;
 
-            $this->mailer = $mailer
-        }
+        $this->mailer = $mailer
+    }
 
 Per default, all autowired dependencies are NOT optional (mandatory) and are
 validated Strict.
@@ -198,28 +198,28 @@ You define services by annotating classes with the @Service annotation. As an
 example i modified the Acme Welcome-controller of the symfony 2 standard 
 edition´s Acme-Demo bundle a little bit:
 
-        <?php
+    <?php
 
-        namespace Acme\DemoBundle\Controller;
+    namespace Acme\DemoBundle\Controller;
 
-        use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-        use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
+    use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+    use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
 
+    /**
+     * @Service (Id="acme.demo.controller.welcome_controller")
+     */
+    class WelcomeController
+    {
         /**
-         * @Service (Id="acme.demo.controller.welcome_controller")
+         * @var Symfony\Bundle\TwigBundle\TwigEngine
          */
-        class WelcomeController
-        {
-            /**
-             * @var Symfony\Bundle\TwigBundle\TwigEngine
-             */
-            private $templatingService;
+        private $templatingService;
 
-            public function indexAction()
-            {
-                return $this->templatingService->renderResponse('AcmeDemoBundle:Welcome:index.html.twig');
-            }
+        public function indexAction()
+        {
+            return $this->templatingService->renderResponse('AcmeDemoBundle:Welcome:index.html.twig');
         }
+    }
 
 Notice the @Service annotation and the $templatingService instance variable
 (see the Service-Suffix that triggers that auto-wiring functionality by naming
@@ -228,9 +228,9 @@ conventions).
 After that i slightly modified the routing_dev.yml (note that per default, the
 Acme-Bundle is only enabled in DEV-mode):
 
-        _welcome:
-            pattern:  /
-            defaults: { _controller: acme.demo.controller.welcome_controller:indexAction }
+    _welcome:
+        pattern:  /
+        defaults: { _controller: acme.demo.controller.welcome_controller:indexAction }
 
 This route is a not a "ordinary" controller/action definition but a 
 "service-route" which means that it points to a controller that has been defined
