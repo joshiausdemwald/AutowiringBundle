@@ -540,12 +540,8 @@ class ServiceResolver
                 {
                     $class = new \ReflectionClass($classname);
                     
-                    // PRE-CHECK, IF @INJECT IS USED WITHIN THE CLASS, TO SAVE CPU TIME
-                    if(preg_match('#\B/\\*.*?@var.+?\\*/\s*(?:class|var|private|public|protected|function)\s+(.+?)\b#s', file_get_contents($class->getFilename()), $matches))
-                    {
-                        $this->classes[$id] = $class;
-                    }
-
+                    $this->classes[$id] = $class;
+                    
                     $this->classMap[$classname] = $id;
                 }
             }
