@@ -26,7 +26,7 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Annotations\AnnotationReader;
+use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
 use Symfony\Component\DependencyInjection\Definition;
 

@@ -33,7 +33,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Annotations\AnnotationReader;
+use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
 
 /**
