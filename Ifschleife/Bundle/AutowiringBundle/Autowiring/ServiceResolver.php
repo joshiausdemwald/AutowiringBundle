@@ -33,7 +33,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
 
 /**
@@ -46,9 +46,10 @@ use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
  */
 class ServiceResolver
 {
-    const ANNOTATION_INJECT     = 'Ifschleife\Bundle\AutowiringBundle\Annotations\Inject';
-    const ANNOTATION_OPTIONAL   = 'Ifschleife\Bundle\AutowiringBundle\Annotations\Optional';
-    const ANNOTATION_STRICT     = 'Ifschleife\Bundle\AutowiringBundle\Annotations\Strict';
+    const ANNOTATION_INJECT     = 1;
+    const ANNOTATION_OPTIONAL   = 2;
+    const ANNOTATION_STRICT     = 4;
+    const ANNOTATION_SERVICE    = 8;
     
     /**
      * @var ContainerBuilder
@@ -96,17 +97,34 @@ class ServiceResolver
     private $parametersMap;
 
     /**
+     * @var boolean
+     */
+    private $isInitialized;
+    
+    /**
+     * @var Reader
+     */
+    private $reader;
+    
+    /**
      * Constructor
      * 
      * @param ContainerBuilder $container: The container builder
      */
-    public function __construct(ContainerBuilder $container, \Doctrine\Common\Annotations\AnnotationReader $reader = null)
+    public function __construct(ContainerBuilder $container, Reader $reader = null)
     {
         $this->container = $container;
-
-        $this->reader = null === $reader ? new \Doctrine\Common\Annotations\AnnotationReader() : $reader;
+        
+        $this->reader = null === $reader ? new AnnotationReader() : $reader;
+        
+        $this->isInitialized = false;
     }
 
+    /**
+     * Initializes all instance variables.
+     * 
+     * @return void
+     */
     public function initialize()
     {
         $this->definitions = $this->container->getDefinitions();
@@ -124,12 +142,30 @@ class ServiceResolver
         $this->classes = array();
 
         $this->parametersMap = array();
-
+        
+        $this->isInitialized = true;
+    }
+    
+    /**
+     * Starts the service resolving by analyzing the
+     * service classes´s property and method annotations.
+     *  
+     * @return void
+     */
+    public function resolve()
+    {
+        if( ! $this->isInitialized)
+        {
+            $this->initialize();
+        }
+        
         $this->resolveServices();
 
         $this->resolveAliases();
 
         $this->extendDefinitions();
+        
+        $this->isInitialized = false;
     }
 
     /**
@@ -234,7 +270,7 @@ class ServiceResolver
 
         if (null !== $constructor)
         {
-            $annotations = $this->reader->getMethodAnnotations($constructor);
+            $annotations = $this->getAnnotations($constructor);
             
             if(array_key_exists(self::ANNOTATION_INJECT, $annotations))
             {
@@ -260,10 +296,13 @@ class ServiceResolver
     {
         foreach ($class->getProperties() AS $property)
         {
-            $annotations = $this->reader->getPropertyAnnotations($property);
+            $annotations = $this->getAnnotations($property);
             
-            $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations);
-            $is_strict   = array_key_exists(self::ANNOTATION_STRICT, $annotations);
+            $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations) 
+                ? $annotations[self::ANNOTATION_OPTIONAL]->getIsOptional() : false;
+        
+            $is_strict   = array_key_exists(self::ANNOTATION_STRICT, $annotations)
+                ? $annotations[self::ANNOTATION_STRICT]->getIsStrict() : true;
             
             /* @var $property \ReflectionProperty */
             if (array_key_exists(self::ANNOTATION_INJECT, $annotations))
@@ -275,7 +314,7 @@ class ServiceResolver
                     throw new UnresolvedServiceException(sprintf('Property "$%s" of class "%s" cannot be injected. Please provide a valid service id.', $property->getName(), $class->getName()));
                 }
 
-                $service_definition = $this->getDefinition($di_hint);
+                $service_definition = $this->container->findDefinition($di_hint);
 
                 $property = null;
 
@@ -287,7 +326,7 @@ class ServiceResolver
                 {
                     $property = new Reference($di_hint, Container::EXCEPTION_ON_INVALID_REFERENCE, true);
                 }
-
+                
                 $definition->setProperty($property->getName(), $property);
             }
             
@@ -296,8 +335,8 @@ class ServiceResolver
             {
                 if ('Service' === substr($property->getName(), -7, 7))
                 {
-                    $service_definition = $this->getDefinition($service_id = Inflector::propertyName2ServiceId($property->getName()));
-
+                    $service_definition = $this->container->findDefinition($service_id = Inflector::propertyName2ServiceId($property->getName()));
+                    
                     if (null !== $service_definition)
                     {
                         $definition->setProperty($property->getName(), new Reference($service_id, Container::EXCEPTION_ON_INVALID_REFERENCE, true));
@@ -317,7 +356,7 @@ class ServiceResolver
     {
         foreach ($class->getMethods() AS $method)
         {
-            $annotations = $this->reader->getMethodAnnotations($method);
+            $annotations = $this->getAnnotations($method);
             
             /* @var $method \ReflectionMethod */
             if (array_key_exists(self::ANNOTATION_INJECT, $annotations))
@@ -357,8 +396,11 @@ class ServiceResolver
         
         $di_hints = $di_hints === null ? null : $this->mapDIHints($signature, $di_hints);
         
-        $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations);
-        $is_strict   = array_key_exists(self::ANNOTATION_STRICT, $annotations);
+        $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations) 
+                ? $annotations[self::ANNOTATION_OPTIONAL]->getIsOptional() : false;
+        
+        $is_strict   = array_key_exists(self::ANNOTATION_STRICT, $annotations)
+                ? $annotations[self::ANNOTATION_STRICT]->getIsStrict() : true;
         
         $arguments = array();
 
@@ -587,5 +629,76 @@ class ServiceResolver
     private function getDefinition($id)
     {
         return isset($this->definitions[$id]) ? $this->definitions[$id] : null;
+    }
+    
+    /**
+     * Maps the autowiring special annotations of methods, properties and classes
+     * to an array with string keys.
+     * 
+     * @param \Reflector $reflector
+     * @return type 
+     */
+    public function getAnnotations(\Reflector $reflector)
+    {
+        return static::getAnnotationsStatic($reflector, $this->reader);
+    }
+    
+    /**
+     * Maps the autowiring special annotations of methods, properties and classes
+     * to an array with string keys.
+     * 
+     * @param \Reflector $reflector
+     * @param Reader $reader
+     * @return type 
+     */
+    public static function getAnnotationsStatic(\Reflector $reflector, Reader $reader = null)
+    {
+        if(null === $reader)
+        {
+            $reader = new AnnotationReader;
+        }
+        
+        $annotations = null;
+        
+        if($reflector instanceof \ReflectionClass)
+        {
+            $annotations = $reader->getClassAnnotations($reflector);
+        }
+        elseif($reflector instanceof \ReflectionMethod)
+        {
+            $annotations = $reader->getMethodAnnotations($reflector);
+        }
+        elseif($reflector instanceof \ReflectionProperty)
+        {
+            $annotations = $reader->getPropertyAnnotations($reflector);
+        }
+        
+        if(null !== $annotations)
+        {
+            $retVal = array();
+            
+            foreach($annotations AS $annotation)
+            {
+                switch(get_class($annotation))
+                {
+                    case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Inject':
+                        $retVal[self::ANNOTATION_INJECT] = $annotation;
+                        continue(2);
+                    case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Optional':
+                        $retVal[self::ANNOTATION_OPTIONAL] = $annotation;
+                        continue(2);
+                    case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Strict':
+                        $retVal[self::ANNOTATION_STRICT] = $annotation;
+                        continue(2);
+                    case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Service':
+                        $retVal[self::ANNOTATION_SERVICE] = $annotation;
+                        continue(2);
+                }
+            }
+            
+            return $retVal;
+        }
+        
+        return null;
     }
 }

@@ -26,7 +26,7 @@ namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 use Doctrine\Common\Annotations\Annotation;
 
 /**
- * Inject Annotation (@Inject)
+ * Strict Annotation (@Strict)
  *
  * @author joshi
  */
@@ -34,6 +34,6 @@ class Strict extends Annotation
 {
     public function getIsStrict()
     {
-        return $value === null ? true : (boolean)$this->value;
+        return $this->value === null ? true : (boolean)$this->value;
     }
 }

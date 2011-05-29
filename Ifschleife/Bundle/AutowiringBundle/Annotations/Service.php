@@ -26,14 +26,24 @@ namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 use Doctrine\Common\Annotations\Annotation;
 
 /**
- * Optional Annotation (@Optional)
+ * Service Annotation (@Service)
  *
  * @author joshi
  */
-class Optional extends Annotation
+class Service extends Annotation
 {
-    public function getIsOptional()
+    /**
+     * @var string $id: The service´s id
+     */
+    public $Id;
+    
+    /**
+     * Returns the service´s id
+     *
+     * @return string $id
+     */
+    public function getId()
     {
-        return $this->value === null ? true : (boolean)$this->value;
+        return $this->Id;
     }
 }

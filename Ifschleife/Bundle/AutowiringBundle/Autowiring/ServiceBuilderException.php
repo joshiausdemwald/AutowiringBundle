@@ -21,19 +21,16 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
+namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
-use Doctrine\Common\Annotations\Annotation;
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
 
 /**
- * Optional Annotation (@Optional)
+ * DuplicateServiceIdException
  *
  * @author joshi
  */
-class Optional extends Annotation
+class ServiceBuilderException extends Exception
 {
-    public function getIsOptional()
-    {
-        return $this->value === null ? true : (boolean)$this->value;
-    }
+    
 }
