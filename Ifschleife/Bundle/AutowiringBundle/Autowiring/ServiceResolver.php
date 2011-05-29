@@ -219,22 +219,16 @@ class ServiceResolver
         {
             $service_id = $this->classMap[$class->getName()];
             
-            // PRE-CHECK, IF @INJECT IS USED WITHIN THE CLASS, TO SAVE CPU TIME
-            $filename = $class->getFilename();
-            
-            if(preg_match('#\B/\\*.*?@var.+?\\*/\s*(?:class|var|private|public|protected|function)\s+(.+?)\b#s', file_get_contents($filename), $matches))
+            // AMBIGUOUS CLASSNAMES ARE NOT ALLOWED TO BE PROCESSED ...
+            if(false !== $service_id)
             {
-                // AMBIGUOUS CLASSNAMES ARE NOT ALLOWED TO BE PROCESSED ...
-                if(false !== $service_id)
-                {
-                    $definition = $this->getDefinition($service_id);
+                $definition = $this->getDefinition($service_id);
 
-                    $this->extendConstructorInjections($definition, $class);
+                $this->extendConstructorInjections($definition, $class);
 
-                    $this->extendMethodCalls($definition, $class);
+                $this->extendMethodCalls($definition, $class);
 
-                    $this->extendPropertyInjections($definition, $class);
-                }
+                $this->extendPropertyInjections($definition, $class);
             }
         }
     }
@@ -533,7 +527,7 @@ class ServiceResolver
         {
             if ( ! $definition->isSynthetic() && ! $definition->isAbstract() && $definition->isPublic())
             {
-                // transform %service_class% to concrete class, regarding parent
+                // Transform %service_class% to concrete class, regarding parent
                 // definitions.
                 $classname = $this->resolveClassname($definition);
                 
@@ -544,7 +538,13 @@ class ServiceResolver
                 }
                 else
                 {
-                    $this->classes[$id] = new \ReflectionClass($classname);
+                    $class = new \ReflectionClass($classname);
+                    
+                    // PRE-CHECK, IF @INJECT IS USED WITHIN THE CLASS, TO SAVE CPU TIME
+                    if(preg_match('#\B/\\*.*?@var.+?\\*/\s*(?:class|var|private|public|protected|function)\s+(.+?)\b#s', file_get_contents($class->getFilename()), $matches))
+                    {
+                        $this->classes[$id] = $class;
+                    }
 
                     $this->classMap[$classname] = $id;
                 }
