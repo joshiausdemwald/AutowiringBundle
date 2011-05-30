@@ -124,7 +124,9 @@ An alternative Syntax is provided to map dependencies to argument names:
     }
 
 The order of the arguments provided is not important when you use named 
-@Inject hints!
+@Inject hints! (Also note, that both the "plain" map-syntax and the strict,
+common "array"-syntax in curly braces {} is supported. There is no strict
+annotation property mapping.)
 
 You may even leave some arguments blank if they can be resolved by the type-
 lookup resolver:
@@ -212,7 +214,7 @@ edition´s Acme-Demo bundle a little bit:
     use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
 
     /**
-     * @Service (Id="acme.demo.controller.welcome_controller")
+     * @Service (Id="my.welcome.controller")
      */
     class WelcomeController
     {
@@ -236,13 +238,43 @@ Acme-Bundle is only enabled in DEV-mode):
 
     _welcome:
         pattern:  /
-        defaults: { _controller: acme.demo.controller.welcome_controller:indexAction }
+        defaults: { _controller: my.welcome.controller:indexAction }
 
 This route is not an "ordinary" controller/action definition but a 
 "service-route" which means that it points to a controller that has been defined
 as a DIC service.
 
 Open the Welcome-Page in your browser (it´s the demo´s homepage). That´s it.
+
+
+Alternative notations for @Service
+----------------------------------
+    
+    @Service(Id="my.welcome.controller")
+
+This is the most verbose and best understandable, thus recommended notation for
+services. Also this notation allows you to provide additional configuration
+options.
+
+    @Service("my.welcome.controller")
+
+(Note the missing "Id-Index", if your service has no options configured, the 
+plain argument is assumed to be the service id.)
+
+    @Service
+
+By ommitting the service id, the injector automatically generates one for you,
+consisting of the lowercased namespace-name of the class (separated by periods 
+"." instead of backslashes "\" and a "tableized" class_name. For example,
+the class 
+
+    "Doctrine\ORM\EntityManager" 
+
+will be transformed into the service name 
+    
+    "doctrine.orm.entity_manager"
+
+, which follows the symfony DIC service naming convention.
 
 Comments are very appreciated! 
            

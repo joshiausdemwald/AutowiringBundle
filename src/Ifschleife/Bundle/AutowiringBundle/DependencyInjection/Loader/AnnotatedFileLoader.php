@@ -36,6 +36,7 @@ use Doctrine\Common\Annotations\Reader;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolver;
 use Ifschleife\Bundle\AutowiringBundle\Annotation\ParameterMismatchException;
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
 
 /**
  * AnnotationFileLoader
@@ -114,7 +115,7 @@ class AnnotatedFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    function supports($resource, $type = null)
+    public function supports($resource, $type = null)
     {   
         if(is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION))
         {
@@ -129,12 +130,11 @@ class AnnotatedFileLoader extends FileLoader
     }
     
     /**
-     * Searches the found classes within the given file for @Service tags
-     * and creates DIC definitions from them.
+     * Creates Services from the given \Reflection classes.
      * 
      * @return void
      */
-    function parseDefinitions()
+    protected function parseDefinitions()
     {
         foreach($this->classes AS $class)
         {
@@ -148,7 +148,7 @@ class AnnotatedFileLoader extends FileLoader
      * @param \ReflectionClass $class
      * @return string $service_id: The newly created or already existant service id or NULL if no definition could be created.
      */
-    private function parseDefinition(\ReflectionClass $class)
+    protected function parseDefinition(\ReflectionClass $class)
     {
         $annotations = $this->getAnnotations($class);
         
@@ -160,7 +160,7 @@ class AnnotatedFileLoader extends FileLoader
             
             if(null === $service_id)
             {
-                throw new ParameterMismatchException(sprintf('Expected Service-Id "Id", NULL given on service annotation @Service in class "%s". Try \'@Service(Id="your.service.id")\'.', $class->getName()));
+                $service_id = $this->generateServiceId($class);
             }
             
             if($this->container->has($service_id))
@@ -182,7 +182,7 @@ class AnnotatedFileLoader extends FileLoader
      * @param \ReflectionClass $class 
      * @return Definition $definition
      */
-    public function createDefinition(\ReflectionClass $class)
+    protected function createDefinition(\ReflectionClass $class)
     {
         if(false !== ($parentClass = $class->getParentClass()) && null !== ($parent_service_id = $this->parseDefinition($parentClass)))
         {
@@ -206,8 +206,18 @@ class AnnotatedFileLoader extends FileLoader
      * @param \ReflectionClass $class 
      * @return array
      */
-    public function getAnnotations(\ReflectionClass $class)
+    protected function getAnnotations(\ReflectionClass $class)
     {
         return ServiceResolver::getAnnotationsStatic($class, $this->reader);
+    }
+    
+    /**
+     * Generates a services id from the given class.
+     * 
+     * @param \ReflectionClass $class 
+     */
+    protected function generateServiceId(\ReflectionClass $class)
+    {
+        return Inflector::className2ServiceId($class->getShortname(), $class->getNamespaceName());
     }
 }

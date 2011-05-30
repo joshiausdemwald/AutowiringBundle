@@ -35,6 +35,7 @@ class Inflector
      * Converts a camelized word into the format of a generic service id. 
      * Converts 'SwiftmailerService' to 'swiftmailer', 
      * 'doctrineEntity_managerService' to 'doctrine.entity_manager'.
+     * 
      * Pattern stolen from doctrine inflector.
      * (@copyright Konsta Vesterinen <kvesteri@cc.hut.fi> @copyright Jonathan H. Wage <jonwage@gmail.com>)
      * 
@@ -46,5 +47,21 @@ class Inflector
         $camelized = preg_replace('#Service$#', '', $propertyName);
 
         return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '.$1', $camelized));
+    }
+    
+    /**
+     * Turns a classname info a service id. Converts Doctrine\ORM\EntityManager to
+     * doctrine.orm.entity_manager.
+     * 
+     * Pattern stolen from doctrine inflector.
+     * (@copyright Konsta Vesterinen <kvesteri@cc.hut.fi> @copyright Jonathan H. Wage <jonwage@gmail.com>)
+     * 
+     * @param string $classname
+     * @param string $namespace_name
+     * @return string: The servized classname
+     */
+    public static function className2ServiceId($classname, $namespace_name = null)
+    {
+        return strtolower((null !== $namespace_name ? str_replace('\\', '.', $namespace_name) . '.' : '') . preg_replace('~(?<=\\w)([A-Z])~', '_$1', $classname));
     }
 }
