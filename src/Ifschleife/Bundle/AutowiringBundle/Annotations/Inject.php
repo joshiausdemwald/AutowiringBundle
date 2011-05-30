@@ -44,6 +44,19 @@ class Inject extends Annotation
             return null;
         }
 
-        return (array) $this->value;
+        return $this->value;
+    }
+    
+    /**
+     * @param string $name Unkown property name
+     * @param mixed $value Property value
+     */
+    public function __set($name, $value)
+    {
+        if( ! is_array($this->value))
+        {
+            $this->value = (array) $this->value;
+        }
+        $this->value[$name] = $value;
     }
 }

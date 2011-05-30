@@ -24,11 +24,10 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Finder\Finder;
+
 use Doctrine\Common\Annotations\Reader;
-use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
-use Symfony\Component\DependencyInjection\Definition;
+
+use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader;
 
 /**
  * ServiceBuilder
@@ -41,52 +40,40 @@ class ServiceBuilder
      *
      * @var ContainerBuilder
      */
-    private $container;
-    
-    /**
-     * @var boolean
-     */
-    private $isInitialized;
+    protected $container;
     
     /**
      * A collection of filenames to parse
      * 
      * @var Iterator/array
      */
-    private $files;
+    protected $files;
     
     /**
-     * @var Reader
+     * @var AnnotatedFileLoader $loader
      */
-    private $reader;
-   
-    /**
-     * @var phpParser
-     */
-    private $phpParser;
-    
-    /**
-     * @var array<\ReflectionClass>
-     */
-    private $classes;
+    protected $loader;
     
     /**
      * Constructor.
      * 
      * @param ContainerBuilder $container 
      */
-    public function __construct(ContainerBuilder $container, Reader $reader = null)
+    public function __construct(ContainerBuilder $container, AnnotatedFileLoader $loader = null)
     {
         $this->container = $container;
         
-        $this->phpParser = new PhpParser();
+        $this->loader = $loader;
         
-        if(null === $reader)
+        if(null === $loader)
         {
-            $this->reader = new AnnotationReader();
+            $this->loader = new AnnotatedFileLoader(
+                $container,
+                new \Symfony\Component\Config\FileLocator(),
+                new Parser\PhpParser,
+                new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader()
+            );
         }
-        
-        $this->isInitialized = false;
     }
     
     /**
@@ -100,47 +87,7 @@ class ServiceBuilder
     {
         $this->files = $files;
     }
-    
-    /**
-     * Gets the default set of files to parse. Default files are
-     * all files under ./Controller subdirectories of ./src dir.
-     * 
-     * If no files specified by setFile(), this default set will
-     * be taken for processing.
-     * 
-     * Use setFiles() to override the default files and define an
-     * individual file set to parse and define as DIC services.
-     * 
-     * @return void
-     */
-    public function getDefaultFileSet()
-    {
-        $finder = new Finder;
-        
-        return $finder
-            ->in($this->container->getParameter('kernel.root_dir') . '/../src/')
-            ->files()
-            ->name('#.*?Controller\.php#i')
-        ->getIterator();
-    }
-    
-    /**
-     * Initializes all instance variables.
-     * 
-     * @return void
-     */
-    public function initialize()
-    {
-        $this->classes = array();
-        
-        if(null === $this->files)
-        {
-            $this->files = $this->getDefaultFileSet();
-        }
-        
-        $this->isInitialized = true;
-    }
-    
+
     /**
      * Builds all services read from class annotation metadata.
      * 
@@ -148,28 +95,12 @@ class ServiceBuilder
      */
     public function build()
     {
-        if( ! $this->isInitialized)
-        {
-            $this->initialize();
-        }
-        
-        $this->collectClasses();
-        
-        $this->createServices();
-        
-        $this->isInitialized = false;
-    }
-    
-    /**
-     * Collects the files and extracts the potential service classes.
-     * 
-     * @return void
-     */
-    private function collectClasses()
-    {
         foreach($this->files AS $file)
         {
-            $this->classes = array_merge($this->classes, $this->phpParser->parseFile($file));
+            if($this->loader->supports((string)$file))
+            {
+                $this->loader->load($file);
+            }
         }
     }
     

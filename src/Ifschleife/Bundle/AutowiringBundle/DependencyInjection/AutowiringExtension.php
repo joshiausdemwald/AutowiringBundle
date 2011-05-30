@@ -23,6 +23,8 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\DependencyInjection;
 
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder;
+
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,6 +33,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Finder\Finder;
 
 /**
  * IfschleifeAutowiringExtension.
@@ -50,6 +53,8 @@ class AutowiringExtension extends Extension
         if (true === $config['enabled'])
         {
             $this->loadAutowiring($config, $container);
+            
+            $this->loadServices($container);
         }
     }
 
@@ -58,6 +63,24 @@ class AutowiringExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $loader->load('autowiring.xml');
+    }
+    
+    /**
+     * Loads the @Service defined services.
+     * @todo configure this stuff.
+     */
+    public function loadServices(ContainerBuilder $container, array $paths = null)
+    {
+        $serviceBuilder = new ServiceBuilder($container);
+        
+        $finder = new Finder();
+
+        $serviceBuilder->setFiles($finder
+            ->in($container->getParameter('kernel.root_dir') . '/../src/')
+            ->name('#.*?Controller\.php#i')
+        ->getIterator());
+
+        $serviceBuilder->build();
     }
 
     /**

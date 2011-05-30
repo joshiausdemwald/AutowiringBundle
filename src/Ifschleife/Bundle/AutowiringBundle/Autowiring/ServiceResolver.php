@@ -267,7 +267,7 @@ class ServiceResolver
             if(array_key_exists(self::ANNOTATION_INJECT, $annotations))
             {
                 $arguments = $this->guessArgumentsForMethodSignature($constructor, $class, $annotations);
-
+                
                 if (count($definition->getArguments()) > 0)
                 {
                     throw new ArgumentsAlreadyDefinedException(sprintf('Constructor "%s()" on class "%s" has already been injected by the dependency injection container or extension configuration. Please check your container´s config files.', $method->getName(), $class->getName()));
@@ -386,7 +386,10 @@ class ServiceResolver
         
         $di_hints = $annotations[self::ANNOTATION_INJECT]->getHints();
         
-        $di_hints = $di_hints === null ? null : $this->mapDIHints($signature, $di_hints);
+        if(null !== $di_hints)
+        {
+            $di_hints = $this->mapDIHints($signature, $di_hints);
+        }
         
         $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations) 
                 ? $annotations[self::ANNOTATION_OPTIONAL]->getIsOptional() : false;
@@ -405,17 +408,28 @@ class ServiceResolver
             if (null === ($type = $parameter->getClass()))
             {
                 // WIRE PARAMETER
-                if (null === $di_hints || !array_key_exists($i, $di_hints))
+                if (null === $di_hints || ! array_key_exists($i, $di_hints))
                 {
                     throw new UnresolvedServiceException(sprintf('Argument "$%s" at method signature "%s()" of class "%s" could not be resolved. Please provide a valid service id.', $parameter->getName(), $method->getName(), $class->getName()));
                 }
 
                 $di_hint = $di_hints[$i];
-
+                
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
-                if (is_string($di_hint) && $this->container->hasParameter($di_hint))
+                if (is_string($di_hint))
                 {
-                    $arguments[] = new Parameter($di_hint);
+                    if($this->container->has($di_hint))
+                    {
+                        $arguments[] = new Reference($di_hint, Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                    }
+                    elseif($this->container->hasParameter($di_hint))
+                    {
+                        $arguments[] = new Parameter($di_hint);
+                    }
+                    else
+                    {
+                        $arguments[] = new Parameter($this->addParameter($di_hint));
+                    }
                 }
                 else
                 {

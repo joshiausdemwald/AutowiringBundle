@@ -35,15 +35,19 @@ class Service extends Annotation
     /**
      * @var string $id: The service´s id
      */
-    public $Id;
+    private $Id;
     
-    /**
-     * Returns the service´s id
-     *
-     * @return string $id
-     */
     public function getId()
     {
-        return $this->Id;
+        if(null !== $this->Id)
+        {
+            return $this->Id;
+        }
+        elseif(null !== $this->value && is_string($this->value))
+        {
+            return $this->value;
+        }
+        
+        return null;
     }
 }

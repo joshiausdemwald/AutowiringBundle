@@ -32,6 +32,7 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser;
 final class PhpParser
 {
     const SERVICE_ANNOTATION_TOKEN = 'Service';
+    
     /**
      * Parses all classes found in the given file. Must have a namespace 
      * configured. Returns a list of \ReflectionClass instances.
@@ -44,9 +45,8 @@ final class PhpParser
     public function parseFile($filename)
     {
         $classes = array();
-        
-        if(preg_match('#\B/\\*(?:.*?)@((?:\w+\\\)*?)'.self::SERVICE_ANNOTATION_TOKEN.'\s*\(.+?\)(?:.*?)\\*/\s*class\b#s', file_get_contents($filename), $matches))
-        {   
+        if(preg_match('#\B/\\*(?:.*?)@((?:.+\\\)*?)'.self::SERVICE_ANNOTATION_TOKEN.'\s*\(.+?\)(?:.*?)\\*/\s*class\b#s', file_get_contents($filename), $matches))
+        {
             $src = php_strip_whitespace($filename);
 
             /**

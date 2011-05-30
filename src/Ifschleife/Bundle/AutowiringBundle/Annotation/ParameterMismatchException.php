@@ -21,31 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Compiler;
-
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Parameter;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolver;
+namespace Ifschleife\Bundle\AutowiringBundle\Annotation;
 
 /**
- * AutowiringCompilerPass
- * 
- * Enriches the service definitions by method and property annotations
- * 
+ * ParameterMismatchException
+ *
  * @author joshi
  */
-class AutowiringCompilerPass implements CompilerPassInterface
+class ParameterMismatchException extends \Exception
 {
-
-    public function process(ContainerBuilder $container)
-    {
-        $serviceResolver = new ServiceResolver($container);
-        $serviceResolver->resolve();
-    }
+    
 }
