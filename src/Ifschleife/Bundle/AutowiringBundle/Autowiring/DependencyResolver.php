@@ -354,6 +354,7 @@ class DependencyResolver
     /**
      * Adds method calls to the DIC configured by class annotations.
      * 
+     * @todo Optimize getMethods() call by using \ReflectionMethod constants
      * @param Definition $definition
      * @param \ReflectionClass $class 
      */
@@ -361,6 +362,8 @@ class DependencyResolver
     {
         foreach ($class->getMethods() AS $method)
         {
+            if($method->isConstructor() || $method->isDestructor() || $method->isStatic() || $method->isAbstract()) continue;
+            
             $annotations = $this->getAnnotations($method);
             
             /* @var $method \ReflectionMethod */
