@@ -117,11 +117,11 @@ class AnnotatedFileLoader extends FileLoader
     public function supports($resource, $type = null)
     {   
         if(is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION))
-        {
+        {   
             $this->classFilePath = $this->locator->locate($resource);
             
             $this->classes = $this->phpParser->parseFile($this->classFilePath);
-                    
+
             return count($this->classes) > 0;
         }
         
