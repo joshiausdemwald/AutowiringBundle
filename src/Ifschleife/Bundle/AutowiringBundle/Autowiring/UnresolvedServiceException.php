@@ -23,14 +23,12 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
-
 /**
  * DefinitionNotFoundException
  *
  * @author joshi
  */
-class UnresolvedServiceException extends ServiceResolverException
+class UnresolvedServiceException extends DependencyResolverException
 {
     
 }

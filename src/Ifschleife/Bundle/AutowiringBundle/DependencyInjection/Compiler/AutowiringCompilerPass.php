@@ -31,7 +31,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolver;
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver;
 
 /**
  * AutowiringCompilerPass
@@ -45,7 +45,7 @@ class AutowiringCompilerPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $serviceResolver = new ServiceResolver($container);
-        $serviceResolver->resolve();
+        $dependencyResolver = new DependencyResolver($container);
+        $dependencyResolver->resolve();
     }
 }

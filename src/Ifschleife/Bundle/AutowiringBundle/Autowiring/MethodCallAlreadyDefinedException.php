@@ -23,14 +23,12 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
-
 /**
  * DefinitionNotFoundException
  *
  * @author joshi
  */
-class MethodCallAlreadyDefinedException extends ServiceResolverException
+class MethodCallAlreadyDefinedException extends DependencyResolverException
 {
     
 }

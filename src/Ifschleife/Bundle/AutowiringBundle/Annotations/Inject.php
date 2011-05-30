@@ -33,18 +33,18 @@ use Doctrine\Common\Annotations\Annotation;
 class Inject extends Annotation
 {
     /**
+     * @var array $values: The values as an array
+     */
+    public $values = array();
+    
+    /**
      * Returns the DI-Service ID hints as a array list.
      * 
      * @return array
      */
     public function getHints()
     {
-        if (null === $this->value)
-        {
-            return null;
-        }
-
-        return $this->value;
+        return (array) $this->value;
     }
     
     /**
@@ -53,10 +53,6 @@ class Inject extends Annotation
      */
     public function __set($name, $value)
     {
-        if( ! is_array($this->value))
-        {
-            $this->value = (array) $this->value;
-        }
         $this->value[$name] = $value;
     }
 }

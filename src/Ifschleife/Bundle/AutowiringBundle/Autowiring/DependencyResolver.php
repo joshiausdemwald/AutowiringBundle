@@ -37,14 +37,14 @@ use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
 
 /**
- * ServiceResolver
+ * DependencyResolver
  * 
  * This class maps @Inject class annotations in each service class to primitive
  * values or services.
  * 
  * @author joshi
  */
-class ServiceResolver
+class DependencyResolver
 {
     const ANNOTATION_INJECT     = 1;
     const ANNOTATION_OPTIONAL   = 2;
@@ -242,10 +242,21 @@ class ServiceResolver
      */
     private function addParameter($value)
     {
-        $id = 'ifschleife.autowiring.' . str_replace('.', '_', uniqid(mt_rand(), true));
+        static $count = 1;
+        
+        static $id;
+        
+        if(null === $id)
+        {
+            $id = md5_file(__FILE__);
+        }
 
+        $service_id = $id . '_' . $count;
+        
         $this->container->setParameter($id, $value);
-
+        
+        $count ++;
+        
         return $id;
     }
     
@@ -306,20 +317,22 @@ class ServiceResolver
                     throw new UnresolvedServiceException(sprintf('Property "$%s" of class "%s" cannot be injected. Please provide a valid service id.', $property->getName(), $class->getName()));
                 }
 
-                $service_definition = $this->container->findDefinition($di_hint);
-
-                $property = null;
-
-                if (null === $service_definition)
+                $inject = null;
+                
+                if ($this->container->has($di_hint))
                 {
-                    $property = new Parameter($this->addParameter($di_hint));
+                    $inject = new Reference($di_hint, Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                }
+                elseif($this->container->hasParameter($di_hint))
+                {
+                    $inject = new Parameter($di_hint);
                 }
                 else
                 {
-                    $property = new Reference($di_hint, Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                    $inject = new Parameter($this->addParameter($di_hint));
                 }
                 
-                $definition->setProperty($property->getName(), $property);
+                $definition->setProperty($property->getName(), $inject);
             }
             
             // GUESS BY NAMING CONVENTION
@@ -384,12 +397,7 @@ class ServiceResolver
 
         $signature_size = count($signature);
         
-        $di_hints = $annotations[self::ANNOTATION_INJECT]->getHints();
-        
-        if(null !== $di_hints)
-        {
-            $di_hints = $this->mapDIHints($signature, $di_hints);
-        }
+        $di_hints = $this->mapDIHints($signature, $annotations[self::ANNOTATION_INJECT]->getHints());
         
         $is_optional = array_key_exists(self::ANNOTATION_OPTIONAL, $annotations) 
                 ? $annotations[self::ANNOTATION_OPTIONAL]->getIsOptional() : false;

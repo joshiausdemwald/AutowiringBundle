@@ -23,8 +23,6 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolverException;
-
 /**
  * DuplicateServiceIdException
  *

@@ -28,7 +28,7 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
  *
  * @author joshi
  */
-class ServiceResolverException extends \Exception
+class DependencyResolverException extends \Exception
 {
     
 }

@@ -128,9 +128,9 @@ class ServiceBuilder
     {
         $annotations = $this->getAnnotations($class);
         
-        if(array_key_exists(ServiceResolver::ANNOTATION_SERVICE, $annotations))
+        if(array_key_exists(DependencyResolver::ANNOTATION_SERVICE, $annotations))
         {
-            $annotation = $annotations[ServiceResolver::ANNOTATION_SERVICE];
+            $annotation = $annotations[DependencyResolver::ANNOTATION_SERVICE];
             
             $service_id = $annotation->getId();
             
@@ -159,6 +159,6 @@ class ServiceBuilder
      */
     public function getAnnotations(\ReflectionClass $class)
     {
-        return ServiceResolver::getAnnotationsStatic($class, $this->reader);
+        return DependencyResolver::getAnnotationsStatic($class, $this->reader);
     }
 }

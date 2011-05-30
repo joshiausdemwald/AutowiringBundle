@@ -20,7 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
  * SOFTWARE.
  */
-
 namespace Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader;
 
 use Symfony\Component\Config\FileLocatorInterface;
@@ -34,7 +33,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Doctrine\Common\Annotations\Reader;
 
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceResolver;
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver;
 use Ifschleife\Bundle\AutowiringBundle\Annotation\ParameterMismatchException;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
 
@@ -152,9 +151,9 @@ class AnnotatedFileLoader extends FileLoader
     {
         $annotations = $this->getAnnotations($class);
         
-        if(array_key_exists(ServiceResolver::ANNOTATION_SERVICE, $annotations))
+        if(array_key_exists(DependencyResolver::ANNOTATION_SERVICE, $annotations))
         {
-            $annotation = $annotations[ServiceResolver::ANNOTATION_SERVICE];
+            $annotation = $annotations[DependencyResolver::ANNOTATION_SERVICE];
             
             $service_id = $annotation->getId();
             
@@ -208,7 +207,7 @@ class AnnotatedFileLoader extends FileLoader
      */
     protected function getAnnotations(\ReflectionClass $class)
     {
-        return ServiceResolver::getAnnotationsStatic($class, $this->reader);
+        return DependencyResolver::getAnnotationsStatic($class, $this->reader);
     }
     
     /**
