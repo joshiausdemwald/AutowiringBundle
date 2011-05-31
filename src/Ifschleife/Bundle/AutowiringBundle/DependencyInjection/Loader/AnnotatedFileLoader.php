@@ -150,19 +150,20 @@ class AnnotatedFileLoader extends FileLoader
     protected function parseDefinition(\ReflectionClass $class)
     {
         $annotations = $this->getAnnotations($class);
-        
+                    
+
         if(array_key_exists(DependencyResolver::ANNOTATION_SERVICE, $annotations))
         {
             $annotation = $annotations[DependencyResolver::ANNOTATION_SERVICE];
             
             $service_id = $annotation->getId();
-            
+
             if(null === $service_id)
             {
                 $service_id = $this->generateServiceId($class);
             }
-            
-            if($this->container->has($service_id))
+
+            if($this->container->hasDefinition($service_id))
             {
                 return $service_id;
             }
