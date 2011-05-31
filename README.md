@@ -241,7 +241,7 @@ Notice the @Service annotation and the $templatingService instance variable
 (see the Service-Suffix that triggers that auto-wiring functionality by naming
 conventions).
 
-After that i slightly modified the routing_dev.yml (note that per default, the
+After that i slightly modified the routing_dev.yml (note that by default the
 Acme-Bundle is only enabled in DEV-mode):
 
     _welcome:
