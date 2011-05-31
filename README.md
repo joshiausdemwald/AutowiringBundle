@@ -46,6 +46,14 @@ Autowiring bundle consists of a container compiler pass that
          
     All dependencies are defined by using a class annotation named @Inject
 
+Note that you are able to use the traditional way of configuring services
+by XML, YAML or plain PHP configuration and may later decide to inject
+new dependencies into them. It is at least questionalable if this 
+behaviour leads to clear application design, so you might want to avoid
+this and concentrate about injecting dependencies into your controller classes
+only, for example, by defining that as services by using the @Service 
+annotation.
+
 Additionally, dependencies can be wired by naming conventions. Naming 
 conventions are supported for property injection only. Each property that ends 
 up with "Service" is resolved by transforming the variable prefix into a valid
