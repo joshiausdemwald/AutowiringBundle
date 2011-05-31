@@ -297,6 +297,7 @@ Needed, not (yet?) implemented features
 - Time-optimized loading process
 - Test-Coverage
 - Documentation
+- PHP-Doc
 
 
 Requirements
