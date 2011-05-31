@@ -37,12 +37,6 @@ use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileL
 class ServiceBuilder
 {
     /**
-     *
-     * @var ContainerBuilder
-     */
-    protected $container;
-    
-    /**
      * A collection of filenames to parse
      * 
      * @var Iterator/array
@@ -61,8 +55,6 @@ class ServiceBuilder
      */
     public function __construct(ContainerBuilder $container, AnnotatedFileLoader $loader = null)
     {
-        $this->container = $container;
-        
         $this->loader = $loader;
         
         if(null === $loader)
@@ -102,63 +94,5 @@ class ServiceBuilder
                 $this->loader->load($file);
             }
         }
-    }
-    
-    /**
-     * Creates a service for each class in the class list.
-     * 
-     * @return void
-     */
-    private function createServices()
-    {
-        foreach($this->classes AS $class)
-        {
-            /* @var $class \ReflectionClass */
-            $definition = $this->createService($class);
-        }
-    }
-    
-    /**
-     * Creates a service for the given \ReflectionClass.
-     * 
-     * @param \ReflectionClass $class
-     * @return Definition $definition
-     */
-    private function createService(\ReflectionClass $class)
-    {
-        $annotations = $this->getAnnotations($class);
-        
-        if(array_key_exists(DependencyResolver::ANNOTATION_SERVICE, $annotations))
-        {
-            $annotation = $annotations[DependencyResolver::ANNOTATION_SERVICE];
-            
-            $service_id = $annotation->getId();
-            
-            // Regards definitions, aliases and concrete getters named getXYZ()
-            if($this->container->has($service_id))
-            {
-                throw new DuplicateServiceIdException(sprintf('A service named "%s" already exists in the DIC.', $service_id));
-            }
-
-            // New Service, create definition and append to the DIC. Don't 
-            // append any arguments, they will be determined by constructor
-            // introspection in later calls.
-            $definition = new Definition($class->getName(), array());
-            
-            $definition->setPublic(true);
-            
-            $this->container->setDefinition($service_id, $definition);
-        }
-    }
-    
-    /**
-     * Returns the @Service and other di related annotation tags for a class.
-     *
-     * @param \ReflectionClass $class 
-     * @return array
-     */
-    public function getAnnotations(\ReflectionClass $class)
-    {
-        return DependencyResolver::getAnnotationsStatic($class, $this->reader);
     }
 }

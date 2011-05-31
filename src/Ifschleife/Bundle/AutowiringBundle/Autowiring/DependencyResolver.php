@@ -44,11 +44,6 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ConstructorInjector;
  */
 class DependencyResolver
 {
-    const ANNOTATION_INJECT     = 1;
-    const ANNOTATION_OPTIONAL   = 2;
-    const ANNOTATION_STRICT     = 4;
-    const ANNOTATION_SERVICE    = 8;
-    
     /**
      * @var ContainerBuilder
      */

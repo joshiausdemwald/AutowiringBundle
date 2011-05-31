@@ -26,16 +26,12 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\Config\Resource\FileResource;
 
 use Doctrine\Common\Annotations\Reader;
 
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver;
-use Ifschleife\Bundle\AutowiringBundle\Annotation\ParameterMismatchException;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector;
 
 /**
  * AnnotationFileLoader
@@ -45,16 +41,10 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
 class AnnotatedFileLoader extends FileLoader
 {
     /**
-     *
      * @var ContainerBuilder
      */
     protected $container;
     
-    /**
-     * @var Reader
-     */
-    protected $reader;
-   
     /**
      * @var phpParser
      */
@@ -76,17 +66,22 @@ class AnnotatedFileLoader extends FileLoader
     protected $locator;
     
     /**
+     * @var ContainerInjector
+     */
+    protected $containerInjector;
+    
+    /**
      * Constructor.
      * 
      * @param ContainerBuilder $container 
      */
     public function __construct(ContainerBuilder $container, FileLocator $locator, PhpParser $parser, Reader $reader)
     {
+        $this->containerInjector = new ContainerInjector($container, $reader);
+
         $this->container = $container;
         
         $this->phpParser = $parser;
-        
-        $this->reader = $reader;
         
         $this->locator = $locator;
     }
@@ -103,7 +98,7 @@ class AnnotatedFileLoader extends FileLoader
         $this->container->addResource(new FileResource($this->classFilePath));
         
         // services
-        $this->parseDefinitions();
+        $this->injectServices();
     }
 
     /**
@@ -133,91 +128,11 @@ class AnnotatedFileLoader extends FileLoader
      * 
      * @return void
      */
-    protected function parseDefinitions()
+    protected function injectServices()
     {
         foreach($this->classes AS $class)
         {
-            $this->parseDefinition($class);
+            $this->containerInjector->injectService($class);
         }
-    }
-    
-    /**
-     * Creates a service for the given \ReflectionClass.
-     * 
-     * @param \ReflectionClass $class
-     * @return string $service_id: The newly created or already existant service id or NULL if no definition could be created.
-     */
-    protected function parseDefinition(\ReflectionClass $class)
-    {
-        $annotations = $this->getAnnotations($class);
-                    
-
-        if(array_key_exists(DependencyResolver::ANNOTATION_SERVICE, $annotations))
-        {
-            $annotation = $annotations[DependencyResolver::ANNOTATION_SERVICE];
-            
-            $service_id = $annotation->getId();
-
-            if(null === $service_id)
-            {
-                $service_id = $this->generateServiceId($class);
-            }
-
-            if($this->container->hasDefinition($service_id))
-            {
-                return $service_id;
-            }
-            
-            $this->container->setDefinition($service_id, $this->createDefinition($class));
-            
-            return $service_id;
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Creates a definition from a class and returns it.
-     *
-     * @param \ReflectionClass $class 
-     * @return Definition $definition
-     */
-    protected function createDefinition(\ReflectionClass $class)
-    {
-        if(false !== ($parentClass = $class->getParentClass()) && null !== ($parent_service_id = $this->parseDefinition($parentClass)))
-        {
-            $definition = new DefinitionDecorator($parent_service_id);
-        }
-        else
-        {
-            $definition = new Definition();
-        }
-        
-        $definition->setClass($class->getName());
-        
-        $definition->setPublic(true);
-        
-        return $definition;
-    }
-    
-    /**
-     * Returns the @Service and other di related annotation tags for a class.
-     *
-     * @param \ReflectionClass $class 
-     * @return array
-     */
-    protected function getAnnotations(\ReflectionClass $class)
-    {
-        return DependencyResolver::getAnnotationsStatic($class, $this->reader);
-    }
-    
-    /**
-     * Generates a services id from the given class.
-     * 
-     * @param \ReflectionClass $class 
-     */
-    protected function generateServiceId(\ReflectionClass $class)
-    {
-        return Inflector::className2ServiceId($class->getShortname(), $class->getNamespaceName());
     }
 }
