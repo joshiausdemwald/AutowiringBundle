@@ -287,6 +287,18 @@ will be transformed into the service name
 Comments are very appreciated! 
            
 
+Needed, not (yet?) implemented features
+---------------------------------------
+
+- Lazy-load dependencies
+- Lazy-load dependencies
+- Lazy-load dependencies
+- Bundle-Configuration
+- Time-optimized loading process
+- Test-Coverage
+- Documentation
+
+
 Requirements
 ------------
 
