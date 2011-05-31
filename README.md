@@ -218,7 +218,6 @@ edition´s Acme-Demo bundle a little bit:
 
     namespace Acme\DemoBundle\Controller;
 
-    use Symfony\Bundle\FrameworkBundle\Controller\Controller;
     use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
 
     /**
