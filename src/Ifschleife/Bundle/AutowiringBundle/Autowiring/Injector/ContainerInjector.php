@@ -102,16 +102,6 @@ class ContainerInjector extends Injector
     }
     
     /**
-     * Reads the method annotations and returns them as a flat array.
-     * 
-     * @param \Reflector $method 
-     */
-    protected function readAnnotations(\Reflector $class)
-    {
-       return $this->reader->getClassAnnotations($class);
-    }
-    
-    /**
      * Generates a services id from the given class.
      * 
      * @param \ReflectionClass $class 
