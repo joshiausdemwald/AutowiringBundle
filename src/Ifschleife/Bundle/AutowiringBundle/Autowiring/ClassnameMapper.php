@@ -242,13 +242,13 @@ class ClassnameMapper
     }
     
     /**
-     * Returns a reference to the first matching service id for the given class name.
+     * Returns the Id of matching service definition for the given class name.
      * 
      * @param string $typename: A classname including namespace in common PHP syntax
      * @param integer $invalidBehaviour: One of the ContainerInterface::*_ON_INVALID_REFERENCE constants.
      * @param boolean $strict: Sets how the reference is validated
      * 
-     * @return Reference $reference: A Reference instance for first matching service id of the given type
+     * @return string $id: The service´s Id
      */
     public function resolveService($typename, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
     {
@@ -262,11 +262,7 @@ class ClassnameMapper
         {
             $service_id = $this->aliasMap[$typename];
         }
-        if (null === $service_id)
-        {
-            return null;
-        }
-        return new Reference($service_id, $invalidBehavior, $strict);
+        return $service_id;
     }
     
     /**

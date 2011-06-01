@@ -25,6 +25,8 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+
 use Doctrine\Common\Annotations\Reader;
 use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper;
@@ -211,5 +213,23 @@ abstract class Injector
         $count ++;
         
         return $id;
+    }
+    
+    /**
+     * Creates a new Reference for a service container definition.
+     * 
+     * @param string $service_id
+     * @param boolean $is_optional
+     * @param boolean $is_strict 
+     */
+    public function createReference($service_id, $is_optional = false, $is_strict = true)
+    {
+        return new Reference(
+             $service_id,
+             $is_optional ?
+                Container::NULL_ON_INVALID_REFERENCE : 
+                Container::EXCEPTION_ON_INVALID_REFERENCE,
+             $is_strict
+        );
     }
 }

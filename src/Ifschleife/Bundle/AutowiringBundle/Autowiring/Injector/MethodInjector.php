@@ -101,7 +101,7 @@ abstract class MethodInjector extends Injector
                 {
                     if($this->container->has($di_hint))
                     {
-                        $arguments[] = new Reference($di_hint, Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                        $arguments[] = $this->createReference($di_hint, $is_optional, $is_strict);
                     }
                     elseif($this->container->hasParameter($di_hint))
                     {
@@ -121,18 +121,23 @@ abstract class MethodInjector extends Injector
             {
                 if (null !== $di_hints && array_key_exists($i, $di_hints))
                 {
-                    $arguments[] = new Reference($di_hints[$i], Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                    $arguments[] = $this->createReference($di_hints[$i], $is_optional, $is_strict);
                 }
                 else
                 {
-                    $reference = $this->getClassNameMapper()->resolveService($type->getName(), Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                    $service_id = $this->getClassNameMapper()->resolveService($type->getName(), Container::EXCEPTION_ON_INVALID_REFERENCE, true);
 
                     if (null === $reference)
                     {
                         throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" could not be auto-resolved. Please provide a valid service id.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
                     }
+                    
+                    if (false === $reference)
+                    {
+                        throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" has been auto-resolved, but the matching services are ambiguous.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
+                    }
 
-                    $arguments[] = $reference;
+                    $arguments[] = $this->createReference($service_id, $is_optional, $is_strict);
                 }
             }
         }
