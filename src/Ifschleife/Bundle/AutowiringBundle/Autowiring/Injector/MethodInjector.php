@@ -78,8 +78,6 @@ abstract class MethodInjector extends Injector
         
         $arguments = array();
         
-        
-        
         for ($i = 0; $signature_size = count($signature), $i < $signature_size; $i++)
         {
             /* @var $parameter \ReflectionParameter */
@@ -99,7 +97,7 @@ abstract class MethodInjector extends Injector
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
                 if (is_string($di_hint))
                 {
-                    if($this->container->has($di_hint))
+                    if($this->container->findDefinition($di_hint))
                     {
                         $arguments[] = $this->createReference($di_hint, $is_optional, $is_strict);
                     }
