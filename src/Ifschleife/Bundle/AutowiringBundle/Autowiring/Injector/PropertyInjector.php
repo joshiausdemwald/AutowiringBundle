@@ -57,7 +57,7 @@ class PropertyInjector extends Injector
 
             $inject = null;
             
-            if ($this->container->hasDefinition($di_hint))
+            if ($this->container->findDefinition($di_hint))
             {
                 $inject = $this->createReference($di_hint, $is_optional, $is_strict);
             }
