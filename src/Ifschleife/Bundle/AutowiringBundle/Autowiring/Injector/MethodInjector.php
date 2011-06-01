@@ -35,26 +35,6 @@ use Symfony\Component\DependencyInjection\Parameter;
 abstract class MethodInjector extends Injector
 {
     /**
-     * @var array
-     */
-    private $classMap;
-    
-    /**
-     * @var array
-     */
-    private $aliasMap;
-    
-    /**
-     * @var array<ReflectionClass>
-     */
-    private $classes;
-    
-    /**
-     * @var array<String, Parameter>
-     */
-    private $parametersMap;
-    
-    /**
      * Guesses arguments size and types by analyzing the to-inject method
      * signature. The $di_hints array contains information about primitive
      * types (may be di parameters or primitive values) and complex types
