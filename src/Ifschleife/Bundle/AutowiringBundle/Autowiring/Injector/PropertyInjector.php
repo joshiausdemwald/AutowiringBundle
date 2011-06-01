@@ -57,9 +57,9 @@ class PropertyInjector extends Injector
 
             $inject = null;
             
-            if ($this->container->has($di_hint))
+            if ($this->container->hasDefinition($di_hint))
             {
-                $inject = new Reference($di_hint, Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                $inject = $this->createReference($di_hint, $is_optional, $is_strict);
             }
             elseif($this->container->hasParameter($di_hint))
             {
@@ -79,11 +79,11 @@ class PropertyInjector extends Injector
             if ('Service' === substr($property->getName(), -7, 7))
             {
                 // changed: from findDefinition to getDefinition
-                $service_definition = $this->container->getDefinition($service_id = Inflector::propertyName2ServiceId($property->getName()));
+                $service_id = Inflector::propertyName2ServiceId($property->getName());
 
-                if (null !== $service_definition)
+                if($this->container->findDefinition($service_id))
                 {
-                    $definition->setProperty($property->getName(), new Reference($service_id, Container::EXCEPTION_ON_INVALID_REFERENCE, true));
+                    $definition->setProperty($property->getName(), $this->createReference($service_id, $is_optional, $is_strict));
                 }
             }
         }

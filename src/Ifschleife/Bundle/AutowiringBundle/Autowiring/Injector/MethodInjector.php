@@ -127,12 +127,12 @@ abstract class MethodInjector extends Injector
                 {
                     $service_id = $this->getClassNameMapper()->resolveService($type->getName(), Container::EXCEPTION_ON_INVALID_REFERENCE, true);
 
-                    if (null === $reference)
+                    if (null === $service_id)
                     {
                         throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" could not be auto-resolved. Please provide a valid service id.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
                     }
                     
-                    if (false === $reference)
+                    if (false === $service_id)
                     {
                         throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" has been auto-resolved, but the matching services are ambiguous.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
                     }
