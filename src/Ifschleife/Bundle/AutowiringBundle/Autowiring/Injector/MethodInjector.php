@@ -62,9 +62,20 @@ abstract class MethodInjector extends Injector
         {
             /* @var $parameter \ReflectionParameter */
             $parameter = $signature[$i];
-
+            
+            $type = null;
+            
+            try 
+            {
+                $type = $parameter->getClass();
+            }
+            catch (\ReflectionException $e)
+            {
+                throw new TypenameMismatchException(sprintf('Type of argument "$%s" of method "%s::%s()" does not exist or cannot be resolved. Did you forgot to import it\'s namespace?', $parameter->getName(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName()), null, $e);
+            }
+            
             // NON-OBJECT PARAMETER
-            if (null === ($type = $parameter->getClass()))
+            if (null === $type)
             {
                 // WIRE PARAMETER
                 if (null === $di_hints || ! array_key_exists($i, $di_hints))
@@ -73,7 +84,7 @@ abstract class MethodInjector extends Injector
                 }
 
                 $di_hint = $di_hints[$i];
-                
+
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
                 if (is_string($di_hint))
                 {
@@ -109,7 +120,7 @@ abstract class MethodInjector extends Injector
                     {
                         throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" could not be auto-resolved. Please provide a valid service id.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
                     }
-                    
+
                     if (false === $service_id)
                     {
                         throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" has been auto-resolved, but the matching services are ambiguous.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
