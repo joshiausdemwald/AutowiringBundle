@@ -67,12 +67,14 @@ abstract class MethodInjector extends Injector
                 {
                     try 
                     {
-                        $arguments[] = $this->container->findDefinition($resource_name);
+                        $this->container->findDefinition($resource_name);
                     }
                     catch(\InvalidArgumentException $e)
                     {
                         throw new UnresolvedServiceException(sprintf('Reference %s for argument "$%s" on method "%s::%s"could not be resolved', $resource_name, $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()), null, $e);
                     }
+                    $arguments[] = $this->createReference($resource_name, $is_optional, $is_strict);
+
                 }
                 elseif($annotationsMap->getIsParameter($i))
                 {
