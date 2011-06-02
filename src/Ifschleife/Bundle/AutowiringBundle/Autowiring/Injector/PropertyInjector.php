@@ -38,7 +38,7 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
 class PropertyInjector extends Injector
 {   
     protected function process(Definition $definition, \Reflector $property)
-    {
+    {        
         $is_optional = $this->hasAnnotation(self::ANNOTATION_OPTIONAL)
                 ? $this->getAnnotation(self::ANNOTATION_OPTIONAL)->getIsOptional() : false;
         
@@ -52,7 +52,7 @@ class PropertyInjector extends Injector
 
             if (null === $di_hints || null === ($di_hint = array_pop($di_hints)))
             {
-                throw new UnresolvedServiceException(sprintf('Property "$%s" of class "%s" cannot be injected. Please provide a valid service id.', $property->getName(), $class->getName()));
+                throw new UnresolvedPropertyException(sprintf('Property "$%s" of class "%s" cannot be injected. Please provide a valid service id.', $property->getName(), $class->getName()));
             }
 
             $inject = null;
@@ -81,9 +81,15 @@ class PropertyInjector extends Injector
                 // changed: from findDefinition to getDefinition
                 $service_id = Inflector::propertyName2ServiceId($property->getName());
 
-                if($this->container->findDefinition($service_id))
+                try 
                 {
+                    $this->container->findDefinition($service_id);
+                    
                     $definition->setProperty($property->getName(), $this->createReference($service_id, $is_optional, $is_strict));
+                }
+                catch(\InvalidArgumentException $e)
+                {
+                    throw new UnresolvedPropertyException(sprintf('Instance property "%s::$%s" on service could not be resolved.', $property->getDeclaringClass()->getName(), $property->getName()), null, $e);
                 }
             }
         }

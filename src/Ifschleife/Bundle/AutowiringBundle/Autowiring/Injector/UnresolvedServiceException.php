@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
+namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 /**
  * UnresolvedServiceException

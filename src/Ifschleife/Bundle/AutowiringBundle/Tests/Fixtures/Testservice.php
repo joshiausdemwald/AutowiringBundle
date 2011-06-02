@@ -11,7 +11,7 @@ use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
 /**
  * Description of Testservice
  *
- * @Service
+ * @Service("ifschleife.autowiring.testservice")
  * @author joshi
  */
 class Testservice

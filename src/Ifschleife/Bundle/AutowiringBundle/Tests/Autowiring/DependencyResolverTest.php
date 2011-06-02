@@ -43,15 +43,33 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         
         $serviceBuilder->build();
         
-        $container->compile();
+        $dependencyResolver = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver($container);
         
+        $dependencyResolver->resolve();
+
         $this->assertTrue($container->hasDefinition('ifschleife.bundle.autowiring_bundle.tests.fixtures.create_service_testclass1'));
         $this->assertTrue($container->hasDefinition('hans.wurst'));
         $this->assertTrue($container->hasDefinition('ifschleife.autowiring.testclass'));
         $this->assertTrue($container->hasDefinition('ifschleife.bundle.autowiring_bundle.tests.fixtures.parent_testclass'));
-        $this->assertTrue($container->hasDefinition('ifschleife.bundle.autowiring_bundle.tests.fixtures.testservice'));
+        $this->assertTrue($container->hasDefinition('ifschleife.autowiring.testservice'));
 
         $definitions = $container->getDefinitions();
+        
+        $this->assertInstanceOf(
+                '\Symfony\Component\DependencyInjection\Reference', 
+                $definitions['ifschleife.autowiring.testclass']->getArgument(0)
+        );
+        
+        $properties = $definitions['ifschleife.autowiring.testclass']->getProperties();
+        
+        $this->assertInstanceOf(
+                '\Symfony\Component\DependencyInjection\Reference', 
+                $properties['ifschleifeAutowiringTestserviceService']
+        );
+        
+        $this->assertInstanceOf('\Symfony\Component\DependencyInjection\DefinitionDecorator', $definitions['ifschleife.autowiring.testclass']);
+        
+        $this->assertEquals('ifschleife.bundle.autowiring_bundle.tests.fixtures.parent_testclass', $definitions['ifschleife.autowiring.testclass']->getParent());
     }
     
     function files()

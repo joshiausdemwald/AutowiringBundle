@@ -21,31 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
-
-use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
-use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
+namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 /**
- * Description of ParentTestclass
+ * UnresolvedPropertyException 
  *
  * @author joshi
- * @Service
  */
-class ParentTestclass
+class UnresolvedPropertyException extends InjectorException
 {
-    private $testservice;
-
-    /**
-     * @Inject
-     */
-    public function setTestservice(Testservice $testservice)
-    {
-        $this->testservice = $testservice;
-    }
-
-    public function getTestservice()
-    {
-        return $this->testservice;
-    }
+    
 }

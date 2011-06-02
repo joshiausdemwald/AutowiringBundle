@@ -42,13 +42,13 @@ class ContainerInjector extends Injector
     /**
      * @param Definition $definition
      * @param \Reflector $class
-     * @return type 
+     * @return string the service id
      */
     public function injectService(\ReflectionClass $class)
     {
         $this->annotations = $this->createAnnotationsMap((array)$this->readAnnotations($class));
         
-        $this->doInject($class);
+        return $this->doInject($class);
     }
     
     protected function doInject(\ReflectionClass $class)
@@ -85,8 +85,10 @@ class ContainerInjector extends Injector
      */
     protected function createDefinition(\ReflectionClass $class)
     {
-        if(false !== ($parentClass = $class->getParentClass()) && null !== ($parent_service_id = $this->doInject($parentClass)))
+        if(false !== ($parentClass = $class->getParentClass()))
         {
+            $parent_service_id = $this->injectService($parentClass);
+            
             $definition = new DefinitionDecorator($parent_service_id);
         }
         else

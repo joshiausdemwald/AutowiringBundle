@@ -145,12 +145,15 @@ class ClassnameMapper
         {
             if ($alias_definition->isPublic())
             {
-                /* @var $alias_definition \Symfony\Component\DependencyInjection\Alias */
-                $target_definition = $this->container->findDefinition($name);
+                $target_definition = null;
                 
-                if (null === $target_definition)
+                try 
                 {
-                    throw new DefinitionNotFoundException(sprintf('Service definition for alias "%s" could not be resolved.', $name));
+                    $target_definition = $this->container->findDefinition($name);
+                }
+                catch(\InvalidArgumentException $e)
+                {
+                    throw new DefinitionNotFoundException(sprintf('Service definition for alias "%s" could not be resolved.', $name), null, $e);
                 }
                 
                 // SYNTHETIC DEFINITIONS HAS NO CLASSNAME

@@ -88,17 +88,20 @@ abstract class MethodInjector extends Injector
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
                 if (is_string($di_hint))
                 {
-                    if($this->container->findDefinition($di_hint))
+                    try 
                     {
-                        $arguments[] = $this->createReference($di_hint, $is_optional, $is_strict);
+                        $arguments[] = $this->container->findDefinition($di_hint);
                     }
-                    elseif($this->container->hasParameter($di_hint))
+                    catch(\InvalidArgumentException $e)
                     {
-                        $arguments[] = new Parameter($di_hint);
-                    }
-                    else
-                    {
-                        $arguments[] = new Parameter($this->addParameter($di_hint));
+                        if($this->container->hasParameter($di_hint))
+                        {
+                            $arguments[] = new Parameter($di_hint);
+                        }
+                        else
+                        {
+                            $arguments[] = new Parameter($this->addParameter($di_hint));
+                        }
                     }
                 }
                 else
