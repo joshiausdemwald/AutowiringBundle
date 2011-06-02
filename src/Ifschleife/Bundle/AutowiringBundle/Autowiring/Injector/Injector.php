@@ -209,11 +209,11 @@ abstract class Injector
 
         $service_id = $id . '_' . $count;
         
-        $this->container->setParameter($id, $value);
+        $this->container->setParameter($service_id, $value);
         
         $count ++;
         
-        return $id;
+        return $service_id;
     }
     
     /**

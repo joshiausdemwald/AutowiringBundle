@@ -48,4 +48,12 @@ class ParentTestclass
     {
         return $this->testservice;
     }
+    
+    /**
+     * @Inject(foo="foo", bar="bar")
+     */
+    public function setFoo($foo, $bar)
+    {
+        
+    }
 }

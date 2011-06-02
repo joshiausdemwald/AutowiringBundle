@@ -70,6 +70,46 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Symfony\Component\DependencyInjection\DefinitionDecorator', $definitions['ifschleife.autowiring.testclass']);
         
         $this->assertEquals('ifschleife.bundle.autowiring_bundle.tests.fixtures.parent_testclass', $definitions['ifschleife.autowiring.testclass']->getParent());
+        
+        $this->assertTrue(
+            $definitions['ifschleife.autowiring.testclass']->hasMethodCall('setTestservice')
+        );
+        
+        $this->assertTrue(
+            $definitions['ifschleife.autowiring.testclass']->hasMethodCall('setFoo')
+        );
+        
+        $methodCalls = $definitions['ifschleife.autowiring.testclass']->getMethodCalls();
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Reference',
+            $methodCalls[0][1][0]
+        );
+        
+        $this->assertEquals(
+            'ifschleife.autowiring.testservice',
+            $methodCalls[0][1][0]->__toString()
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[1][1][0]
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[1][1][1]
+        );
+        
+        $this->assertEquals(
+            'foo',
+            $container->getParameter($methodCalls[1][1][0]->__toString())
+        );
+        
+        $this->assertEquals(
+            'bar',
+            $container->getParameter($methodCalls[1][1][1]->__toString())
+        );
     }
     
     function files()
