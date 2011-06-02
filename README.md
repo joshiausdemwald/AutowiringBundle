@@ -132,7 +132,7 @@ This also works for multiple arguments too, of course:
 An alternative Syntax is provided to map dependencies to argument names:
 
     /**
-     * @Inject(mailer="my.mighty.mailer", em="doctrine.entity_manager")
+     * @Inject(mailer="@my.mighty.mailer", em="@doctrine.entity_manager")
      */
     public function setEntityManager(
                      \Doctrine\ORM\EntityManager $em, 
