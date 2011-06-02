@@ -20,13 +20,13 @@ use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
 class Testclass extends ParentTestclass
 {
     private $testsvc;
+    
     private $ifschleifeAutowiringTestserviceService;
 
     /**
-     *
-     * @param Testservice $testservice 
-     * @Optional
      * @Inject
+     * @Optional
+     * @param Testservice $testservice 
      */
     public function __construct(Testservice $testservice)
     {

@@ -35,7 +35,7 @@ class Service extends Annotation
     /**
      * @var string $id: The service´s id
      */
-    private $Id;
+    public $Id;
     
     public function getId()
     {

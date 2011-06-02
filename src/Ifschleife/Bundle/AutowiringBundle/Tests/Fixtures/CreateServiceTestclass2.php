@@ -23,29 +23,14 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
 
-use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
 
 /**
- * Description of ParentTestclass
+ * CreateServiceTestclass
  *
- * @Service
  * @author joshi
  */
-class ParentTestclass
+class CreateServiceTestclass2
 {
-    private $testservice;
-
-    /**
-     * @Inject
-     */
-    public function setTestservice(Testservice $testservice)
-    {
-        $this->testservice = $testservice;
-    }
-
-    public function getTestservice()
-    {
-        return $this->testservice;
-    }
+    
 }

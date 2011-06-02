@@ -79,7 +79,7 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                array(__DIR__ . '/../Fixtures/CreateServiceTestclass1.php')
+                array(__DIR__ . '/../Fixtures/CreateServiceMalformed', __DIR__ . '/../Fixtures/Nofile', __DIR__ . '/../Fixtures/CreateServiceTestclass1.php',__DIR__ . '/../Fixtures/CreateServiceTestclass2.php'),
             )
         );
     }

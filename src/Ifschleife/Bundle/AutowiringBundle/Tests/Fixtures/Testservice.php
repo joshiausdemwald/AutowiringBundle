@@ -6,14 +6,16 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
 
+use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
+
 /**
  * Description of Testservice
  *
+ * @Service
  * @author joshi
  */
 class Testservice
 {
-
     public function hello()
     {
         return 'hello';
