@@ -81,7 +81,7 @@ this feature (which is possible) or explicitly "type-hint" the definition-type
 by using the "@Inject"-annotation:
         
     /**
-     * @Inject("doctrine.entity_manager")
+     * @Inject("@doctrine.entity_manager")
      */
     private $entityManager;
 
@@ -108,7 +108,7 @@ In the case a service is ambiguous or you want to explicetly define the
 dependency, use the @Inject annotation:
 
     /**
-     * @Inject("doctrine.entity_manager")
+     * @Inject("@doctrine.entity_manager")
      */
     public function setEntityManager(\Doctrine\ORM\EntityManager $em)
     {
@@ -118,7 +118,7 @@ dependency, use the @Inject annotation:
 This also works for multiple arguments too, of course:
 
     /**
-     * @Inject({"doctrine.entity_manager", "my.mighty.mailer"})
+     * @Inject({"@doctrine.entity_manager", "@my.mighty.mailer"})
      */
     public function setEntityManager(
                      \Doctrine\ORM\EntityManager $em, 
@@ -152,7 +152,7 @@ You may even leave some arguments blank if they can be resolved by the type-
 lookup resolver:
 
     /**
-     * @Inject(mailer="my.mighty.mailer")
+     * @Inject(mailer="@my.mighty.mailer")
      */
     public function setEntityManager(
                      \Doctrine\ORM\EntityManager $em, 
@@ -182,7 +182,7 @@ Example:
     /**
      * @Strict(false)
      * @Optional
-     * @Inject("my.mighty.mailer")
+     * @Inject("@my.mighty.mailer")
      */
     public function setEntityManager(
                      \Doctrine\ORM\EntityManager $em, 
@@ -198,7 +198,7 @@ or:
     /**
      * @Strict
      * @Optional(false)
-     * @Inject("my.mighty.mailer")
+     * @Inject("@my.mighty.mailer")
      */
     public function setEntityManager(
                      \Doctrine\ORM\EntityManager $em, 
