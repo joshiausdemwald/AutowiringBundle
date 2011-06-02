@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
+namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 /**
- * DefinitionNotFoundException
+ * ArgumentsAlreadyDefinedException
  *
  * @author joshi
  */
-class DefinitionNotFoundException extends AutowiringException
+class ArgumentsAlreadyDefinedException extends InjectorException
 {
     
 }

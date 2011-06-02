@@ -21,14 +21,16 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
+namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
 
 /**
- * DefinitionNotFoundException
+ * PhpparserTestclass to test PhpParser
  *
+ * @Inject
  * @author joshi
  */
-class ArgumentsAlreadyDefinedException extends DependencyResolverException
+class PhpParserTestclass1
 {
-    
 }
+
+

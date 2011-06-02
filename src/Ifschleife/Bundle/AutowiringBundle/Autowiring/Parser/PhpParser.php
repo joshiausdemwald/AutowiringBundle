@@ -20,57 +20,82 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
  * SOFTWARE.
  */
-
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser;
-
-/**
- * Parses a file for namespaces/use/class declarations.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes Heinen <johannes.heinen@gmail.com>
- */
-final class PhpParser
+namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser
 {
-    const SERVICE_ANNOTATION_TOKEN = 'Service';
+    use Ifschleife\Bundle\AutowiringBundle\Autowiring\AutowiringException;
     
     /**
-     * Parses all classes found in the given file. Must have a namespace 
-     * configured. Returns a list of \ReflectionClass instances.
-     * 
-     * @todo provide a reliable shortcut for single-class files
-     * @param string $filename 
-     * @return array $classes: An array of all found classes within the file as 
-     *                         instances of \ReflectionClass
+     * Parses a file for namespaces/use/class declarations.
+     *
+     * @author Fabien Potencier <fabien@symfony.com>
+     * @author Johannes Heinen <johannes.heinen@gmail.com>
      */
-    public function parseFile($filename)
+    final class PhpParser
     {
-        $classes = array();
-        
-        //if(preg_match('#/\*(?:.*?)@(?:.*?)' . self::SERVICE_ANNOTATION_TOKEN . '\s*(?:\(.+?\))?(?:.*?)\*/\s*class\b#s', file_get_contents($filename), $matches))
-      //  {       
-            $src = php_strip_whitespace($filename);
+        const SERVICE_ANNOTATION_TOKEN = 'Service';
 
-            /**
-             * Idea & Regex-Pattern derived from \Doctrine\Common\Annotations\PhpParser (@author Fabien Potencier <fabien@symfony.com>
-             */
-            if(preg_match_all('#\bnamespace\s+(.+?)\s*;.*?\bclass\s+(.+?)\b#s', $src, $matches))
-            {
-                $classes = array();
+        /**
+         * Parses all classes found in the given file. Must have a namespace 
+         * configured. Returns a list of \ReflectionClass instances.
+         * 
+         * @todo provide a reliable shortcut for single-class files
+         * @param string $filename 
+         * @return array $classes: An array of all found classes within the file as 
+         *                         instances of \ReflectionClass
+         */
+        public function parseFile($filename)
+        {
+            $classes = array();
 
-                for($i = 0; $i < count($matches[0]); $i++) 
+            //if(preg_match('#/\*(?:.*?)@(?:.*?)' . self::SERVICE_ANNOTATION_TOKEN . '\s*(?:\(.+?\))?(?:.*?)\*/\s*class\b#s', file_get_contents($filename), $matches))
+          //  {       
+                $src = php_strip_whitespace($filename);
+
+                /**
+                 * Idea & Regex-Pattern derived from \Doctrine\Common\Annotations\PhpParser (@author Fabien Potencier <fabien@symfony.com>
+                 */
+                if(preg_match_all('#(?:(?:\bnamespace\s+(.+?)\s*(?:;|\\{).*?)?\bclass\s+(.+?)\b)+?#s', $src, $matches))
                 {
-                    $classname = $matches[1][$i] . '\\' . $matches[2][$i];
+                    $classes = array();
 
-                    if( ! class_exists($classname))
+                    $namespace = null;
+                    
+                    for($i = 0; $i < count($matches[0]); $i++) 
                     {
-                        require_once $filename;
-                    }
+                        // REMEMBER PREVIOUS NAMESPACE
+                        if($matches[1][$i])
+                        {
+                            $namespace = $matches[1][$i];
+                        }
+                        
+                        $classname = $namespace . '\\' . $matches[2][$i];
 
-                    $classes[$classname] = new \ReflectionClass($classname);
+                        if( ! class_exists($classname))
+                        {
+                            require_once $filename;
+                        }
+
+                        try 
+                        {
+                            $classes[$classname] = new \ReflectionClass($classname);
+                        }
+                        catch(\ReflectionException $e)
+                        {
+                            throw new PhpParserException(sprintf('PHP parser exception: Class "%s" in file "%s" could not be autoloaded.', $classname, realpath($filename)), null, $e);
+                        }   
+                    }
                 }
-            }
-     //   }
-        
-        return $classes;
+         //   }
+
+            return $classes;
+        }
+    }
+    
+    /**
+     * Parser Exception class
+     */
+    class PhpParserException extends AutowiringException
+    {
+
     }
 }

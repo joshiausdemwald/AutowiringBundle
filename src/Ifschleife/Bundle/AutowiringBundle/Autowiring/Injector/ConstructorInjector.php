@@ -24,7 +24,7 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 use Symfony\Component\DependencyInjection\Definition;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ArgumentsAlreadyDefinedException;
+
 /**
  * Description of ConstuctorInjector
  *

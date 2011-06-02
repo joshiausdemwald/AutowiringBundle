@@ -21,14 +21,28 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
+namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
 
 /**
- * DefinitionNotFoundException
+ * PhpparserTestclass 2a to test PhpParser
  *
  * @author joshi
  */
-class DefinitionNotFoundException extends AutowiringException
+class PhpParserTestclass4
 {
     
 }
+
+/**
+ * PhpparserTestclass2b  to test PhpParser
+ *
+ * @Inject
+ * @author joshi
+ */
+class PhpParserTestclass4a
+{
+    
+}
+
+
+

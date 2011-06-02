@@ -24,11 +24,11 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
 /**
- * DefinitionNotFoundException
+ * AutowiringException
  *
  * @author joshi
  */
-class DefinitionNotFoundException extends AutowiringException
+class AutowiringException extends \Exception
 {
     
 }

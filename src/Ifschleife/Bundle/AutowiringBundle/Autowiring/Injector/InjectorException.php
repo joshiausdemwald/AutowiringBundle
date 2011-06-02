@@ -23,12 +23,14 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\AutowiringException;
+
 /**
  * Generic InjectorException
  *
  * @author joshi
  */
-class InjectorException extends \Exception
+class InjectorException extends AutowiringException
 {
     
 }

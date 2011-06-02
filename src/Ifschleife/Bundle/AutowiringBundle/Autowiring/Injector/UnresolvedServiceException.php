@@ -24,11 +24,11 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
 /**
- * DuplicateServiceIdException
+ * UnresolvedServiceException
  *
  * @author joshi
  */
-class ServiceBuilderException extends Exception
+class UnresolvedServiceException extends InjectorException
 {
     
 }

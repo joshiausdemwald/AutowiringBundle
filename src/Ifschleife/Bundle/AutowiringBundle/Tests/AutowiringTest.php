@@ -21,14 +21,17 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
+namespace Ifschleife\Bundle\AutowiringBundle\Tests;
 
 /**
- * DefinitionNotFoundException
+ * AutowiringTest
  *
  * @author joshi
  */
-class DefinitionNotFoundException extends AutowiringException
+class AutowiringTest extends \PHPUnit_Framework_TestCase
 {
-    
+    function testTrue()
+    {
+       // $this->assertTrue(false, 'Not true!');
+    }
 }

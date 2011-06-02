@@ -14,7 +14,7 @@
             <argument type="service" id="ifschleife.autowiring.configurator" />
             <tag name="kernel.listener" event="onCoreController" />
         </service-->
-        <service id="ifschleife.autowiring.testclass" class="Ifschleife\Bundle\AutowiringBundle\Test\Testclass"/>
-        <service id="ifschleife.autowiring.testservice" class="Ifschleife\Bundle\AutowiringBundle\Test\Testservice"/>
+        <service id="ifschleife.autowiring.testclass" class="Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\Testclass"/>
+        <service id="ifschleife.autowiring.testservice" class="Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\Testservice"/>
     </services>
 </container>

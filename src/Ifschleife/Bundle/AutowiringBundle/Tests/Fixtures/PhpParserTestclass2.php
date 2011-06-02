@@ -21,14 +21,29 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
-
-/**
- * DefinitionNotFoundException
- *
- * @author joshi
- */
-class DependencyResolverException extends \Exception
+namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures
 {
-    
+    /**
+     * PhpparserTestclass 2a to test PhpParser
+     *
+     * @author joshi
+     */
+    class PhpParserTestclass2
+    {
+
+    }
+
+    /**
+     * PhpparserTestclass2b  to test PhpParser
+     *
+     * @Inject
+     * @author joshi
+     */
+    class PhpParserTestclass2a
+    {
+
+    }
 }
+
+
+

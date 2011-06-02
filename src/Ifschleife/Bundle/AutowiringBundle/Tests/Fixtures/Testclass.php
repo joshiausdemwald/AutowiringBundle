@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Test;
+namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
 
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Inject;
 use Ifschleife\Bundle\AutowiringBundle\Annotations\Optional;

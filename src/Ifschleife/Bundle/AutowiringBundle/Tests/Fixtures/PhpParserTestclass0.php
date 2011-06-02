@@ -21,14 +21,17 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
+namespace Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures;
 
-/**
- * DefinitionNotFoundException
- *
- * @author joshi
- */
-class DefinitionNotFoundException extends AutowiringException
+$a_var = "test";
+
+function test1()
 {
     
 }
+
+function test2()
+{
+    
+}
+

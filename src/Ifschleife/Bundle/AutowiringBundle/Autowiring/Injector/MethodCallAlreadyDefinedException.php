@@ -24,11 +24,11 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
 /**
- * DefinitionNotFoundException
+ * MethodCallAlreadyDefinedException
  *
  * @author joshi
  */
-class MethodCallAlreadyDefinedException extends DependencyResolverException
+class MethodCallAlreadyDefinedException extends InjectorException
 {
     
 }
