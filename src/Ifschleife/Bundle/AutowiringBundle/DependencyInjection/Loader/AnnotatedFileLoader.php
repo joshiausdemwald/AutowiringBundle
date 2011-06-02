@@ -87,6 +87,14 @@ class AnnotatedFileLoader extends FileLoader
     }
     
     /**
+     * @return ContainerBuilder
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+    
+    /**
      * Loads an XML file.
      *
      * @param mixed  $resource The resource

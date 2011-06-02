@@ -62,6 +62,6 @@ class Inflector
      */
     public static function className2ServiceId($classname, $namespace_name = null)
     {
-        return strtolower((null !== $namespace_name ? str_replace('\\', '.', $namespace_name) . '.' : '') . preg_replace('~(?<=\\w)([A-Z])~', '_$1', $classname));
+        return strtolower((null !== $namespace_name ? preg_replace('~(?<=\\w)([A-Z])~', '_$1', str_replace('\\', '.', $namespace_name)) . '.' : '') . preg_replace('~(?<=\\w)([A-Z])~', '_$1', $classname));
     }
 }
