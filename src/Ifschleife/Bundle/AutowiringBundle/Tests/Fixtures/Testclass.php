@@ -22,7 +22,17 @@ class Testclass extends ParentTestclass
     private $testsvc;
     
     private $ifschleifeAutowiringTestserviceService;
-
+    
+    /**
+     * @Inject("@ifschleife.autowiring.testservice")
+     */
+    private $testsvc2;
+    
+    /**
+     * @Inject("dingdong")
+     */
+    private $testsvc3;
+    
     /**
      * @Inject
      * @Optional

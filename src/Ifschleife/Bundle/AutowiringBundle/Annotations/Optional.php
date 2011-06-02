@@ -23,14 +23,12 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 
-use Doctrine\Common\Annotations\Annotation;
-
 /**
  * Optional Annotation (@Optional)
  *
  * @author joshi
  */
-class Optional extends Annotation
+class Optional extends \Doctrine\Common\Annotations\Annotation
 {
     public function getIsOptional()
     {

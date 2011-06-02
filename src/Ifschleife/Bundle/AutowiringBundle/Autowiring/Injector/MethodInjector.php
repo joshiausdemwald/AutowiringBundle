@@ -36,20 +36,13 @@ abstract class MethodInjector extends Injector
 {
     /**
      * Guesses arguments size and types by analyzing the to-inject method
-     * signature. The $di_hints array contains information about primitive
-     * types (may be di parameters or primitive values) and complex types
-     * that e.g. are defined ambiguous in the DIC.
+     * signature.
      * 
      * @param \ReflectionMethod $method
-     * @param array $di_hints
      * @return array $arguments
      */
     public function guessArgumentsForMethodSignature(\ReflectionMethod $method)
     {
-        $signature = $method->getParameters();
-
-        $di_hints = $this->mapDIHints($signature, $this->getAnnotation(self::ANNOTATION_INJECT)->getHints());
-        
         $is_optional = $this->hasAnnotation(self::ANNOTATION_OPTIONAL)
                 ? $this->getAnnotation(self::ANNOTATION_OPTIONAL)->getIsOptional() : false;
         
@@ -58,62 +51,53 @@ abstract class MethodInjector extends Injector
         
         $arguments = array();
         
-        for ($i = 0; $signature_size = count($signature), $i < $signature_size; $i++)
+        $parameters = $method->getParameters();
+        
+        $annotationsMap = new AnnotationsMap((array)$this->getAnnotation(self::ANNOTATION_INJECT)->value, $parameters);
+        
+        /* @var $parameter \ReflectionParameter */
+        foreach ($parameters AS $i => $parameter)
         {
-            /* @var $parameter \ReflectionParameter */
-            $parameter = $signature[$i];
-            
-            $type = null;
-            
-            try 
+            if($annotationsMap->hasHint($i))
             {
-                $type = $parameter->getClass();
-            }
-            catch (\ReflectionException $e)
-            {
-                throw new TypenameMismatchException(sprintf('Type of argument "$%s" of method "%s::%s()" does not exist or cannot be resolved. Did you forgot to import it\'s namespace?', $parameter->getName(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName()), null, $e);
-            }
-            
-            // NON-OBJECT PARAMETER
-            if (null === $type)
-            {
-                // WIRE PARAMETER
-                if (null === $di_hints || ! array_key_exists($i, $di_hints))
-                {
-                    throw new UnresolvedServiceException(sprintf('Argument "$%s" at method signature "%s()" of class "%s" could not be resolved. Please provide a valid service id.', $parameter->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
-                }
-
-                $di_hint = $di_hints[$i];
-
+                $resource_name = $annotationsMap->getResourceName($i);
+                
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
-                if (is_string($di_hint))
+                if($annotationsMap->getIsReference($i))
                 {
                     try 
                     {
-                        $arguments[] = $this->container->findDefinition($di_hint);
+                        $arguments[] = $this->container->findDefinition($resource_name);
                     }
                     catch(\InvalidArgumentException $e)
                     {
-                        if($this->container->hasParameter($di_hint))
-                        {
-                            $arguments[] = new Parameter($di_hint);
-                        }
-                        else
-                        {
-                            $arguments[] = new Parameter($this->addParameter($di_hint));
-                        }
+                        throw new UnresolvedServiceException(sprintf('Reference %s for argument "$%s" on method "%s::%s"could not be resolved', $resource_name, $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()), null, $e);
+                    }
+                }
+                elseif($annotationsMap->getIsParameter($i))
+                {
+                    if($this->container->hasParameter($resource_name))
+                    {
+                        $arguments[] = new Parameter($resource_name);
+                    }
+                    else
+                    {
+                        throw new UnresolvedParameterException(sprintf('Parameter %s for argument "$%s" on method "%s::%s"could not be resolved', $resource_name, $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()));
                     }
                 }
                 else
                 {
-                    $arguments[] = new Parameter($this->addParameter($di_hint));
+                    $arguments[] = new Parameter($this->addParameter($resource_name));
                 }
             }
             else
             {
-                if (null !== $di_hints && array_key_exists($i, $di_hints))
+                $type = $parameter->getClass();
+                
+                if(null === $type)
                 {
-                    $arguments[] = $this->createReference($di_hints[$i], $is_optional, $is_strict);
+                    //throw new UnresolvedServiceException(sprintf('Argument "$%s" at method signature "%s()" of class "%s" could not be resolved. Please provide a valid service id.', $parameter->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
+                    throw new TypenameMismatchException(sprintf('Type of argument "$%s" of method "%s::%s()" does not exist or cannot be resolved. Did you forgot to import it\'s namespace?', $parameter->getName(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName()));
                 }
                 else
                 {
@@ -133,7 +117,6 @@ abstract class MethodInjector extends Injector
                 }
             }
         }
-
         return $arguments;
     }
     
@@ -145,43 +128,5 @@ abstract class MethodInjector extends Injector
     protected function readAnnotations(\Reflector $method)
     {
        return $this->reader->getMethodAnnotations($method);
-    }
-    
-    /**
-     * Orders and maps the di hints provided in any Inject() annotation
-     * to the proper method names.
-     * 
-     * @param array $signature
-     * @param array $di_hints
-     * @return array 
-     */
-    protected function mapDIHints(array $signature, array $di_hints)
-    {
-        $output = array();
-
-        $length = count($signature);
-
-        for ($i = 0; $i < $length; $i++)
-        {
-            /* @var $parameter \ReflectionParameter */
-            $parameter = $signature[$i];
-
-            $name = $parameter->getName();
-
-            if (isset($di_hints[$name]))
-            {
-                $output[$i] = $di_hints[$name];
-            }
-            elseif (isset($di_hints[$i]))
-            {
-                $output[$i] = $di_hints[$i];
-            }
-            elseif ($parameter->isDefaultValueAvailable())
-            {
-                $output[$i] = $parameter->getDefaultValue();
-            }
-        }
-
-        return $output;
     }
 }

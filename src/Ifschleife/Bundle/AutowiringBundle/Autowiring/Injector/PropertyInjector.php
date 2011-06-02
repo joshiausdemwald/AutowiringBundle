@@ -48,26 +48,40 @@ class PropertyInjector extends Injector
         /* @var $property \ReflectionProperty */
         if ($this->hasAnnotation(self::ANNOTATION_INJECT))
         {
-            $di_hints = $this->getAnnotation(self::ANNOTATION_INJECT)->getHints();
-
-            if (null === $di_hints || null === ($di_hint = array_pop($di_hints)))
+            $annotationMap = new AnnotationsMap((array)$this->getAnnotation(self::ANNOTATION_INJECT)->value, array($property));
+            
+            if (! $annotationMap->hasHint(0))
             {
-                throw new UnresolvedPropertyException(sprintf('Property "$%s" of class "%s" cannot be injected. Please provide a valid service id.', $property->getName(), $class->getName()));
+                throw new UnresolvedPropertyException(sprintf('Property "$%s" of class "%s" cannot be injected. Please provide a valid service id.', $property->getName(), $property->getDeclaringClass()->getName()));
             }
 
             $inject = null;
             
-            if ($this->container->findDefinition($di_hint))
+            $resource_name = $annotationMap->getResourceName(0);
+            
+            if($annotationMap->getIsReference(0))
             {
-                $inject = $this->createReference($di_hint, $is_optional, $is_strict);
+                try 
+                {
+                    $this->container->findDefinition($resource_name);
+                }
+                catch(\InvalidArgumentException $e)
+                {
+                    throw new UnresolvedServiceException(sprintf('Property "$%s" of class "%s" cannot be injected because reference "%s" could not be resolved. Please provide a valid service id.', $property->getName(), $property->getDeclaringClass()->getName(), $di_hint), null, $e);
+                }
+                $inject = $this->createReference($resource_name, $is_optional, $is_strict);
             }
-            elseif($this->container->hasParameter($di_hint))
+            elseif($annotationMap->getIsParameter(0))
             {
-                $inject = new Parameter($di_hint);
+                if(! $this->container->hasParameter($resource_name))
+                {
+                    throw new UnresolvedParamterException(sprintf('Property "$%s" of class "%s" cannot be injected because parameter "%s" could not be resolved. Please provide a valid parameter name.', $property->getName(), $property->getDeclaringClass()->getName(), $di_hint), null, $e);
+                }
+                $inject = new Parameter($resource_name);
             }
             else
             {
-                $inject = new Parameter($this->addParameter($di_hint));
+                $inject = new Parameter($this->addParameter($resource_name));
             }
 
             $definition->setProperty($property->getName(), $inject);

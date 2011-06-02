@@ -23,14 +23,12 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 
-use Doctrine\Common\Annotations\Annotation;
-
 /**
  * Strict Annotation (@Strict)
  *
  * @author joshi
  */
-class Strict extends Annotation
+class Strict extends \Doctrine\Common\Annotations\Annotation
 {
     public function getIsStrict()
     {

@@ -21,31 +21,36 @@
  * SOFTWARE.
  */
 
-namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
-
 /**
- * Inject Annotation (@Inject)
+ * InjectTest
  *
  * @author joshi
  */
-class Inject extends Annotation
+class InjectTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @var mixed $value: The values as an array or string
-     */
-    public $value;
-    
-    /**
-     * @param string $name Unkown property name
-     * @param mixed $value Property value
-     */
-    public function __set($name, $value)
+    function testInject()
     {
-        if( ! is_array($this->value))
-        {
-            $this->value = array();
-        }
+        /*
+        $inject = new \Ifschleife\Bundle\AutowiringBundle\Annotations\Inject(array
+        (
+            '@reference.name',
+            '%parameter.name%',
+            'plainvalue'
+        ));
         
-        $this->value[$name] = $value;
+        $this->assertInternalType('array', $inject->getHints());
+        $this->assertInternalType('array', $inject->value);
+        
+        $inject = new \Ifschleife\Bundle\AutowiringBundle\Annotations\Inject(array
+        (
+            'ref' => '@reference.name',
+            'param' => '%parameter.name%',
+            'plain' => 'plainvalue'
+        ));
+        
+        $this->assertInternalType('array', $inject->getHints());
+        $this->assertEquals('@reference.name', $inject->ref);
+        $this->assertEquals('%parameter.name%', $inject->param);
+        $this->assertEquals('plainvalue', $inject->plain);*/
     }
 }

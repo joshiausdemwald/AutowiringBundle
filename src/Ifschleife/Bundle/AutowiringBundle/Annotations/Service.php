@@ -23,8 +23,6 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 
-use Doctrine\Common\Annotations\Annotation;
-
 /**
  * Service Annotation (@Service)
  *

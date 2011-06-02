@@ -52,8 +52,15 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('ifschleife.autowiring.testclass'));
         $this->assertTrue($container->hasDefinition('ifschleife.bundle.autowiring_bundle.tests.fixtures.parent_testclass'));
         $this->assertTrue($container->hasDefinition('ifschleife.autowiring.testservice'));
-
+        
         $definitions = $container->getDefinitions();
+        
+        $properties  = $definitions['ifschleife.autowiring.testclass']->getProperties();
+        
+        $this->assertArrayHasKey('ifschleifeAutowiringTestserviceService', $properties);
+        $this->assertArrayHasKey('testsvc2', $properties);
+        
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $properties['testsvc2']);
         
         $this->assertInstanceOf(
                 '\Symfony\Component\DependencyInjection\Reference', 

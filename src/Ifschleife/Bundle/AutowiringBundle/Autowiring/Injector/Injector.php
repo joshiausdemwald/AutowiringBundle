@@ -172,16 +172,16 @@ abstract class Injector
             switch(get_class($annotation))
             {
                 case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Inject':
-                    $retVal[self::ANNOTATION_INJECT] = $annotation;
+                    $retVal[self::ANNOTATION_INJECT]    = $annotation;
                     continue(2);
                 case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Optional':
-                    $retVal[self::ANNOTATION_OPTIONAL] = $annotation;
+                    $retVal[self::ANNOTATION_OPTIONAL]  = $annotation;
                     continue(2);
                 case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Strict':
-                    $retVal[self::ANNOTATION_STRICT] = $annotation;
+                    $retVal[self::ANNOTATION_STRICT]    = $annotation;
                     continue(2);
                 case 'Ifschleife\Bundle\AutowiringBundle\Annotations\Service':
-                    $retVal[self::ANNOTATION_SERVICE] = $annotation;
+                    $retVal[self::ANNOTATION_SERVICE]   = $annotation;
                     continue(2);
             }
         }

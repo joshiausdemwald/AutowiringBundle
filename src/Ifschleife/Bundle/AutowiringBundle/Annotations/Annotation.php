@@ -24,28 +24,11 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Annotations;
 
 /**
- * Inject Annotation (@Inject)
+ * Abstract injection annotation class
  *
  * @author joshi
  */
-class Inject extends Annotation
+abstract class Annotation extends \Doctrine\Common\Annotations\Annotation
 {
-    /**
-     * @var mixed $value: The values as an array or string
-     */
-    public $value;
     
-    /**
-     * @param string $name Unkown property name
-     * @param mixed $value Property value
-     */
-    public function __set($name, $value)
-    {
-        if( ! is_array($this->value))
-        {
-            $this->value = array();
-        }
-        
-        $this->value[$name] = $value;
-    }
 }

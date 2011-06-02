@@ -16,6 +16,8 @@ use Ifschleife\Bundle\AutowiringBundle\Annotations\Service;
  */
 class Testservice
 {
+    public $test;
+    
     public function hello()
     {
         return 'hello';
