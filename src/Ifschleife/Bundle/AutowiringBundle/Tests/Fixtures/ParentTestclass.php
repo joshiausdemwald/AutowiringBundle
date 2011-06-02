@@ -56,4 +56,32 @@ class ParentTestclass
     {
         
     }
+    
+    /**
+     * @Inject({"foo", "bar"})
+     */
+    public function setBar($foo, $bar)
+    {
+        
+    }
+    
+    /**
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param type $foo 
+     * @Inject(foo="bar")
+     */
+    public function setFoobar1(\Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\Testservice $service, $foo)
+    {
+        
+    }
+    
+    /**
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param type $foo 
+     * @Inject(foo="bar")
+     */
+    public function setFoobar2($foo, \Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\Testservice $service)
+    {
+        
+    }
 }

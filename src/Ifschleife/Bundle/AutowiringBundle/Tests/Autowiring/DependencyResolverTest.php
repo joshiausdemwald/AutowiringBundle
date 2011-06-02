@@ -79,6 +79,18 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
             $definitions['ifschleife.autowiring.testclass']->hasMethodCall('setFoo')
         );
         
+        $this->assertTrue(
+            $definitions['ifschleife.autowiring.testclass']->hasMethodCall('setBar')
+        );
+        
+        $this->assertTrue(
+            $definitions['ifschleife.autowiring.testclass']->hasMethodCall('setFoobar1')
+        );
+        
+        $this->assertTrue(
+            $definitions['ifschleife.autowiring.testclass']->hasMethodCall('setFoobar2')
+        );
+        
         $methodCalls = $definitions['ifschleife.autowiring.testclass']->getMethodCalls();
         
         $this->assertInstanceOf(
@@ -101,6 +113,36 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
             $methodCalls[1][1][1]
         );
         
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[2][1][0]
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[2][1][1]
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Reference',
+            $methodCalls[3][1][0]
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[3][1][1]
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[4][1][0]
+        );
+        
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Reference',
+            $methodCalls[4][1][1]
+        );
+        
         $this->assertEquals(
             'foo',
             $container->getParameter($methodCalls[1][1][0]->__toString())
@@ -109,6 +151,36 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'bar',
             $container->getParameter($methodCalls[1][1][1]->__toString())
+        );
+        
+        $this->assertEquals(
+            'foo',
+            $container->getParameter($methodCalls[2][1][0]->__toString())
+        );
+        
+        $this->assertEquals(
+            'bar',
+            $container->getParameter($methodCalls[2][1][1]->__toString())
+        );
+        
+        $this->assertEquals(
+            'ifschleife.autowiring.testservice',
+            $methodCalls[3][1][0]->__toString()
+        );
+        
+        $this->assertEquals(
+            'bar',
+            $container->getParameter($methodCalls[3][1][1]->__toString())
+        );
+        
+        $this->assertEquals(
+            'bar',
+            $container->getParameter($methodCalls[4][1][0]->__toString())
+        );
+        
+        $this->assertEquals(
+            'ifschleife.autowiring.testservice',
+            $methodCalls[4][1][1]->__toString()
         );
     }
     
