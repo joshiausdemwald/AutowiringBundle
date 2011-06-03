@@ -69,7 +69,22 @@ class ContainerInjector extends Injector
                 return $service_id;
             }
             
-            $this->container->setDefinition($service_id, $this->createDefinition($class));
+            $definition = $this->createDefinition($class);
+            
+            if($class->isAbstract())
+            {
+                $definition->isAbstract();
+            }
+            
+            $definition->setFile($annotation->getFile());
+            
+            $definition->setPublic($annotation->getPublic());
+            
+            $definition->setScope($annotation->getScope());
+            
+            $definition->setTags($annotation->getTags());
+            
+            $this->container->setDefinition($service_id, $definition);
             
             return $service_id;
         }

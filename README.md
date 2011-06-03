@@ -295,6 +295,32 @@ will be transformed into the service name
 
 , which follows the symfony DIC service naming convention.
 
+Optional @Service parameters
+----------------------------
+
+There are several additional parameters to fine-tune your service. Please consult
+the symfony 2 documentation, their use is pretty straight-forward and fits the
+conventions of other configuration means like XML or Yaml.
+
+A note to scopes that are (at the moment and afraik) slightly undocumented:
+
+Scope="container" means "static" for services, which means that there is only
+one instance and that it's constructed by a factory. "prototype" means that 
+a new instance of the service is created each time it is requested.
+
+Additional information might be found here: 
+https://github.com/kriswallsmith/symfony-scoped-container
+
+Example:
+
+    /**
+     * @Service(Id="my.service", Scope="container", "Tags"={"my.tag", "my.other.tag"}, File="myFileResource", Public="false")
+     */
+    class myService
+    {
+        // ...
+    }
+
 Comments are very appreciated! 
            
 
