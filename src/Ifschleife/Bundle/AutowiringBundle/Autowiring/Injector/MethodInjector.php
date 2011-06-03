@@ -81,7 +81,7 @@ abstract class MethodInjector extends Injector
                     }
                     elseif($is_optional)
                     {
-                        // THROWS NonOptionalArgumentException IF ARGUMENT MAY NOT BE OPTIONAL
+                        // THROWS NonOptionalArgumentException IF ARGUMENT MAY NOT BE OPTIONAL, IS NULLABLE OR HAS DEFAULT VALUE
                         $this->getBehaviour($parameter, true);
                     }
                     else 
