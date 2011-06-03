@@ -6,7 +6,7 @@ What`s NEW?
 
 June '11:
 
-- Testcoverage
+- Testcoverage (yet incomplete)
 
 - Support fine-graned configuration of services. The following configuraton 
 options are built-in:
