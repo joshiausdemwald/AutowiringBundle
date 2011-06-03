@@ -248,12 +248,10 @@ class ClassnameMapper
      * Returns the Id of matching service definition for the given class name.
      * 
      * @param string $typename: A classname including namespace in common PHP syntax
-     * @param integer $invalidBehaviour: One of the ContainerInterface::*_ON_INVALID_REFERENCE constants.
-     * @param boolean $strict: Sets how the reference is validated
      * 
      * @return string $id: The service´s Id
      */
-    public function resolveService($typename, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
+    public function resolveService($typename)
     {
         $service_id = null;
 

@@ -70,17 +70,24 @@ abstract class MethodInjector extends Injector
                         throw new UnresolvedReferenceException(sprintf('Argument "$%s" on method "%s::%s()" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name), null, $e);
                     }
                     
-                    $arguments[] = $this->createReference($resource_name, $is_optional, true);
+                    $arguments[] = $this->createReference($resource_name, $this->getBehaviour($parameter, $is_optional), true);
 
                 }
                 elseif($annotationsMap->getIsParameter($i))
                 {
-                    if(! $this->container->hasParameter($resource_name))
+                    if($this->container->hasParameter($resource_name))
+                    {
+                        $arguments[] = new Parameter($resource_name);
+                    }
+                    elseif($is_optional)
+                    {
+                        // THROWS NonOptionalArgumentException IF ARGUMENT MAY NOT BE OPTIONAL
+                        $this->getBehaviour($parameter, true);
+                    }
+                    else 
                     {
                         throw new UnresolvedParameterException(sprintf('Argument "$%s" on method "%s::%s()"could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name));
                     }
-                    
-                    $arguments[] = new Parameter($resource_name);
                 }
                 else
                 {
@@ -107,8 +114,8 @@ abstract class MethodInjector extends Injector
                     throw new MissingIdentifierException(sprintf('Argument "$%s" at method signature of "%s::%s()" cannot not be resolved without an identifier: Please provide a valid service id, or a parameter name, or a plain value.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()));
                 }
                 else
-                {
-                    $service_id = $this->getClassNameMapper()->resolveService($type->getName(), Container::EXCEPTION_ON_INVALID_REFERENCE, true);
+                {   
+                    $service_id = $this->getClassNameMapper()->resolveService($type->getName());
 
                     if (null === $service_id)
                     {
@@ -119,8 +126,8 @@ abstract class MethodInjector extends Injector
                     {
                         throw new AmbiguousServiceReferenceException(sprintf('Argument "$%s" of type "%s" at method signature of "%s::%s()" could not be distinctly allocated: There is more than on services that rely on the given type. Please provide a valid, distinct service id.', $parameter->getName(), $type->getName(),  $method->getDeclaringClass()->getName(), $method->getName()));
                     }
-
-                    $arguments[] = $this->createReference($service_id, false, true);
+                    
+                    $arguments[] = $this->createReference($service_id, $this->getBehaviour($parameter), true);
                 }
             }
         }
@@ -135,5 +142,28 @@ abstract class MethodInjector extends Injector
     protected function readAnnotations(\Reflector $method)
     {
        return $this->reader->getMethodAnnotations($method);
+    }
+    
+    protected function getBehaviour(\ReflectionParameter $parameter, $is_optional = null)
+    {
+        if(null === $is_optional || $is_optional)
+        {
+            if($parameter->isOptional() || $parameter->isDefaultValueAvailable())
+            {
+                return Container::IGNORE_ON_INVALID_REFERENCE;
+            }
+            elseif($parameter->allowsNull())
+            {
+                return Container::NULL_ON_INVALID_REFERENCE;
+            }
+            
+            // Provide a warning
+            if($is_optional)
+            {
+                throw new NonOptionalArgumentException(sprintf('Injection for Argument "$%s" at signature of method "%s::%s()" must not defined beeing optional. Provide a type hint!', $parameter->getName(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName()));
+            }
+        }
+        
+        return Container::EXCEPTION_ON_INVALID_REFERENCE;
     }
 }
