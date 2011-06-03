@@ -63,7 +63,7 @@ class ServiceBuilder
                 $container,
                 new \Symfony\Component\Config\FileLocator(),
                 new Parser\PhpParser,
-                new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader()
+                new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator()
             );
         }
     }

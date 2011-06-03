@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Doctrine\Common\Annotations\Reader;
 
-use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
+use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
 
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\Injector;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector;
@@ -83,7 +83,7 @@ class DependencyResolver
     {
         $this->container = $container;
         
-        $reader = null === $reader ? new AnnotationReader() : $reader;
+        $reader = null === $reader ? new AnnotationReaderDecorator() : $reader;
         
         $this->propertyInjector     = new PropertyInjector($container, $reader);
         $this->constructorInjector  = new ConstructorInjector($container, $reader);

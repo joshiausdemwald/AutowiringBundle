@@ -23,11 +23,12 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Tests\DependencyInjection\Loader;
 
-use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
-use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
 use Symfony\Component\Config\FileLocator;
+use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader;
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
 
 /**
  * AnnotatedFileLoaderTest
@@ -45,7 +46,7 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $parser = new PhpParser();
         
-        $reader = new AnnotationReader;
+        $reader = new AnnotationReaderDecorator();
         
         $locator = new FileLocator();
         
@@ -63,7 +64,7 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $parser = new PhpParser();
         
-        $reader = new AnnotationReader;
+        $reader = new AnnotationReaderDecorator;
         
         $locator = new FileLocator();
         

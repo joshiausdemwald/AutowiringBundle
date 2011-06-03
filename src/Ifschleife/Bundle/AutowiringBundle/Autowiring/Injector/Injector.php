@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Doctrine\Common\Annotations\Reader;
-use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReader;
+
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper;
 
 /**
