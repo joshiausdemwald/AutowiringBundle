@@ -39,13 +39,7 @@ class PropertyInjector extends Injector
 {   
     protected function process(Definition $definition, \Reflector $property)
     {        
-        $is_optional = $this->hasAnnotation(self::ANNOTATION_OPTIONAL)
-                ? $this->getAnnotation(self::ANNOTATION_OPTIONAL)->getIsOptional() : false;
-        
-        $is_strict   = $this->hasAnnotation(self::ANNOTATION_STRICT)
-            ? $this->getAnnotation(self::ANNOTATION_STRICT)->getIsStrict() : true;
-
-         $inject = null;
+        $inject = null;
         
         /* @var $property \ReflectionProperty */
         if ($this->hasAnnotation(self::ANNOTATION_INJECT))
@@ -56,9 +50,11 @@ class PropertyInjector extends Injector
             {
                 throw new MissingIdentifierException(sprintf('Property "%s::$%s" cannot not be resolved without an identifier. Please provide a valid service id, or a parameter name, or a plain value.', $property->getDeclaringClass()->getName(), $property->getName()));
             }
-
+            
             $resource_name = $annotationMap->getResourceName(0);
             
+            $is_optional = $annotationMap->getIsOptional(0);
+
             if($annotationMap->getIsReference(0))
             {
                 try 
@@ -70,16 +66,18 @@ class PropertyInjector extends Injector
                     throw new UnresolvedReferenceException(sprintf('Instance property "%s::$%s" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $property->getDeclaringClass()->getName(), $property->getName(), $resource_name), null, $e);
                 }
                 
-                $inject = $this->createReference($resource_name, $is_optional, $is_strict);
+                $inject = $this->createReference($resource_name, $is_optional, true);
             }
             elseif($annotationMap->getIsParameter(0))
             {
-                if(! $this->container->hasParameter($resource_name))
+                if($this->container->hasParameter($resource_name) && ! $is_optional)
+                {
+                    $inject = new Parameter($resource_name);
+                }
+                else
                 {
                     throw new UnresolvedParamterException(sprintf('Instance property "%s::$%s" could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $property->getDeclaringClass()->getName(), $property->getName(), $resouce_name));
                 }
-                
-                $inject = new Parameter($resource_name);
             }
             
             // CREATE NEW DI-PARAMETER
@@ -105,7 +103,7 @@ class PropertyInjector extends Injector
                     throw new UnresolvedReferenceException(sprintf('Instance property "%s::$%s" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $property->getDeclaringClass()->getName(), $property->getName(), $service_id), null, $e);
                 }
                 
-                $inject = $this->createReference($service_id, $is_optional, $is_strict);
+                $inject = $this->createReference($service_id, false, true);
             }
             elseif('Parameter' === substr($property->getName(), -9, 9))
             {

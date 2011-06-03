@@ -43,12 +43,6 @@ abstract class MethodInjector extends Injector
      */
     public function guessArgumentsForMethodSignature(\ReflectionMethod $method)
     {
-        $is_optional = $this->hasAnnotation(self::ANNOTATION_OPTIONAL)
-                ? $this->getAnnotation(self::ANNOTATION_OPTIONAL)->getIsOptional() : false;
-        
-        $is_strict   = $this->hasAnnotation(self::ANNOTATION_STRICT)
-                ? $this->getAnnotation(self::ANNOTATION_STRICT)->getIsStrict() : true;
-        
         $arguments = array();
         
         $parameters = $method->getParameters();
@@ -60,6 +54,8 @@ abstract class MethodInjector extends Injector
         {
             if($annotationsMap->hasHint($i))
             {
+                $is_optional = $annotationsMap->getIsOptional($i);
+
                 $resource_name = $annotationsMap->getResourceName($i);
                 
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
@@ -74,7 +70,7 @@ abstract class MethodInjector extends Injector
                         throw new UnresolvedReferenceException(sprintf('Argument "$%s" on method "%s::%s()" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name), null, $e);
                     }
                     
-                    $arguments[] = $this->createReference($resource_name, $is_optional, $is_strict);
+                    $arguments[] = $this->createReference($resource_name, $is_optional, true);
 
                 }
                 elseif($annotationsMap->getIsParameter($i))
@@ -124,7 +120,7 @@ abstract class MethodInjector extends Injector
                         throw new AmbiguousServiceReferenceException(sprintf('Argument "$%s" of type "%s" at method signature of "%s::%s()" could not be distinctly allocated: There is more than on services that rely on the given type. Please provide a valid, distinct service id.', $parameter->getName(), $type->getName(),  $method->getDeclaringClass()->getName(), $method->getName()));
                     }
 
-                    $arguments[] = $this->createReference($service_id, $is_optional, $is_strict);
+                    $arguments[] = $this->createReference($service_id, false, true);
                 }
             }
         }

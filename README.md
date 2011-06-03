@@ -76,14 +76,29 @@ service identifier. For example,
 will be transformed into "doctrine.entity_manager" and automatically resolved
 by using the symfony´s DIC property injection feature.
 
+Parameters may be wired by using the "Parameter" suffix analoguously:
+
+    private $mySettingParameter
+
+will transform into "my.setting".
+
 Wiring by naming conventions is slightly magical, so you may want to disable
-this feature (which is possible) or explicitly "type-hint" the definition-type
-by using the "@Inject"-annotation:
+this feature by configuration (which is possible) or explicitly "type-hint" the 
+definition-type by using the "@Inject"-annotation:
         
     /**
      * @Inject("@doctrine.entity_manager")
      */
     private $entityManager;
+
+    /**
+     * @Inject("%my.setting%")
+     */
+    private $mySetting;
+
+Injecting plain values is also possible. Just omit the "%" or "@" signs and pro-
+vide a value, it'll be automatically registered as a Container Parameter and 
+bound to your instance variable.
 
 Dependencies may even be wired by introspection (the only aspect of DI that
 supports introspection-wiring is setter-injection). If a instance method has a 
@@ -148,8 +163,8 @@ The order of the arguments provided is not important when you use named
 common "array"-syntax in curly braces {} is supported. There is no strict
 annotation property mapping.)
 
-You may even leave some arguments blank if they can be resolved by the type-
-lookup resolver:
+You may even leave some arguments blank if they can be resolved by argument type
+lookup:
 
     /**
      * @Inject(mailer="@my.mighty.mailer")
@@ -211,6 +226,10 @@ or:
 
 By default, all autowired dependencies are NOT optional (mandatory) and are
 validated Strict.
+
+Exception: Method arguments that have default values are automatically defined
+optional if not explicetly specified by an @Optional annotation.
+
 
 Annotations for defining services
 --------------------------------------------

@@ -90,6 +90,19 @@ class AnnotationsMap
         return $this->detectResourceType($index) === 'plain_value';
     }
     
+    public function getIsOptional($index)
+    {
+        if($this->getIsPlainValue($index))
+        {
+            return null;
+        }
+        if('?' === substr($this->propertyMap[$index], 1, 1))
+        {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Detects the resource type off the given value.
      * "@"-prefixed: Service reference
@@ -106,7 +119,7 @@ class AnnotationsMap
         {
             return 'reference';
         }
-        elseif(0 === strpos($value, '%') && '%' === substr($value, -1, 1))
+        elseif(0 === strpos($value, '%'))
         {
             return 'parameter';
         }
@@ -123,12 +136,9 @@ class AnnotationsMap
     
     public function getResourceName($index)
     {
-        switch($this->detectResourceType($index))
+        if(in_array($this->detectResourceType($index), array('reference', 'parameter')))
         {
-            case 'reference':
-                return substr($this->propertyMap[$index], 1);
-            case 'parameter':
-                return substr(substr($this->propertyMap[$index], 1), -1, 1);
+            return preg_replace('#^(?:%|@)\\??(.+?)#', '\1', $this->propertyMap[$index]);
         }
         
         return $this->propertyMap[$index];
