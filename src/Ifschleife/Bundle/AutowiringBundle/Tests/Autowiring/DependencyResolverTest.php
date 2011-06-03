@@ -37,6 +37,8 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
         
+        $container->setParameter('superparameter', 'superparametervalue');
+        
         $serviceBuilder = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder($container);
         
         $serviceBuilder->setFiles($files);

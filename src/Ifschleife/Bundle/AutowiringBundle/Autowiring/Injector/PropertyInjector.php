@@ -109,8 +109,8 @@ class PropertyInjector extends Injector
             }
             elseif('Parameter' === substr($property->getName(), -9, 9))
             {
-                $parameter_name = Inflector::propertyName2ServiceId($property->getName());
-
+                $parameter_name = Inflector::propertyName2ParameterName($property->getName());
+                
                 if( ! $this->container->hasParameter($parameter_name))
                 {
                     throw new UnresolvedParameterException(sprintf('Instance property "%s::$%s" could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $property->getDeclaringClass(), $property->getName(), $parameter_name));

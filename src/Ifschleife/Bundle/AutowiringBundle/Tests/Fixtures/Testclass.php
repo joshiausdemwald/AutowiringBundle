@@ -33,6 +33,8 @@ class Testclass extends ParentTestclass
      */
     private $testsvc3;
     
+    private $superparameterParameter;
+    
     /**
      * @Inject
      * @Optional

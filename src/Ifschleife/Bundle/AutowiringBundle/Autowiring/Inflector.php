@@ -76,7 +76,7 @@ class Inflector
      */
     public static function propertyName2x($propertyName, $x)
     {
-        $camelized = preg_replace('#'.$x.'$#', '', $propertyName);
+        $camelized = preg_replace('#' . $x . '$#', '', $propertyName);
 
         return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '.$1', $camelized));
     }
