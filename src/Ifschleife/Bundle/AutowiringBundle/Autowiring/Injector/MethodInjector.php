@@ -71,21 +71,20 @@ abstract class MethodInjector extends Injector
                     }
                     catch(\InvalidArgumentException $e)
                     {
-                        throw new UnresolvedServiceException(sprintf('Reference %s for argument "$%s" on method "%s::%s"could not be resolved', $resource_name, $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()), null, $e);
+                        throw new UnresolvedReferenceException(sprintf('Argument "$%s" on method "%s::%s()" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name), null, $e);
                     }
+                    
                     $arguments[] = $this->createReference($resource_name, $is_optional, $is_strict);
 
                 }
                 elseif($annotationsMap->getIsParameter($i))
                 {
-                    if($this->container->hasParameter($resource_name))
+                    if(! $this->container->hasParameter($resource_name))
                     {
-                        $arguments[] = new Parameter($resource_name);
+                        throw new UnresolvedParameterException(sprintf('Argument "$%s" on method "%s::%s()"could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name));
                     }
-                    else
-                    {
-                        throw new UnresolvedParameterException(sprintf('Parameter %s for argument "$%s" on method "%s::%s"could not be resolved', $resource_name, $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()));
-                    }
+                    
+                    $arguments[] = new Parameter($resource_name);
                 }
                 else
                 {
@@ -94,12 +93,22 @@ abstract class MethodInjector extends Injector
             }
             else
             {
-                $type = $parameter->getClass();
+                $type = null;
+                
+                try 
+                {
+                    $type = $parameter->getClass();
+                }
+                
+                // Error resolving/autoloading class
+                catch(\ReflectionException $e)
+                {
+                    throw new TypenameMismatchException(sprintf('Class of argument "$%s" at method signature of "%s::%s()" does not exist or could not be loaded. Probably a namespace typo?', $parameter->getName(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName()), null, $e);
+                }
                 
                 if(null === $type)
                 {
-                    //throw new UnresolvedServiceException(sprintf('Argument "$%s" at method signature "%s()" of class "%s" could not be resolved. Please provide a valid service id.', $parameter->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
-                    throw new TypenameMismatchException(sprintf('Type of argument "$%s" of method "%s::%s()" does not exist or cannot be resolved. Did you forgot to import it\'s namespace?', $parameter->getName(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName()));
+                    throw new MissingIdentifierException(sprintf('Argument "$%s" at method signature of "%s::%s()" cannot not be resolved without an identifier: Please provide a valid service id, or a parameter name, or a plain value.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName()));
                 }
                 else
                 {
@@ -107,12 +116,12 @@ abstract class MethodInjector extends Injector
 
                     if (null === $service_id)
                     {
-                        throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" could not be auto-resolved. Please provide a valid service id.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
+                        throw new UnresolvedReferenceException(sprintf('Argument "$%s" at method signature of "%s::%s()" could not be resolved: There is no service that matches the arguments typename. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $type->getName()));
                     }
 
                     if (false === $service_id)
                     {
-                        throw new UnresolvedServiceException(sprintf('Argument "$%s" of type "%s" at method signature "%s()" of class "%s" has been auto-resolved, but the matching services are ambiguous.', $parameter->getName(), $type->getName(), $method->getName(), $method->getDeclaringClass()->getName()));
+                        throw new AmbiguousServiceReferenceException(sprintf('Argument "$%s" of type "%s" at method signature of "%s::%s()" could not be distinctly allocated: There is more than on services that rely on the given type. Please provide a valid, distinct service id.', $parameter->getName(), $type->getName(),  $method->getDeclaringClass()->getName(), $method->getName()));
                     }
 
                     $arguments[] = $this->createReference($service_id, $is_optional, $is_strict);

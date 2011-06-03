@@ -24,11 +24,11 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 /**
- * UnresolvedPropertyException 
+ * UnresolvedParameterException 
  *
  * @author joshi
  */
-class UnresolvedPropertyException extends InjectorException
+class UnresolvedParameterException extends InjectorException
 {
     
 }

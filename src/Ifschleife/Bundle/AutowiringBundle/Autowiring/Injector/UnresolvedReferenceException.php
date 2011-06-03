@@ -24,11 +24,11 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 /**
- * UnresolvedServiceException
+ * UnresolvedReferenceException 
  *
  * @author joshi
  */
-class UnresolvedServiceException extends InjectorException
+class UnresolvedReferenceException extends InjectorException
 {
     
 }

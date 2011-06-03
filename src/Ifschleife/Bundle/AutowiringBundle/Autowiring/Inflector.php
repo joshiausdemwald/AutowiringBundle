@@ -44,7 +44,39 @@ class Inflector
      */
     public static function propertyName2ServiceId($propertyName)
     {
-        $camelized = preg_replace('#Service$#', '', $propertyName);
+        return self::propertyName2x($propertyName, 'Service');
+    }
+    
+    /**
+     * Converts a camelized word into the format of a generic parameter name. 
+     * Converts 'SwiftmailerParameter' to 'swiftmailer', 
+     * 'doctrineEntity_managerParameter' to 'doctrine.entity_manager'.
+     * 
+     * Pattern stolen from doctrine inflector.
+     * (@copyright Konsta Vesterinen <kvesteri@cc.hut.fi> @copyright Jonathan H. Wage <jonwage@gmail.com>)
+     * 
+     * @param  string $word  Word to transform
+     * @return string $word  "serviceIdzed" word
+     */
+    public static function propertyName2ParameterName($propertyName)
+    {
+        return self::propertyName2x($propertyName, 'Parameter');
+    }
+    
+    /**
+     * Converts a camelized word into the format of a generic parameter name. 
+     * Converts 'Swiftmailer$x' to 'swiftmailer', 
+     * 'doctrineEntity_manager$x' to 'doctrine.entity_manager'.
+     * 
+     * Pattern stolen from doctrine inflector.
+     * (@copyright Konsta Vesterinen <kvesteri@cc.hut.fi> @copyright Jonathan H. Wage <jonwage@gmail.com>)
+     * 
+     * @param  string $word  Word to transform
+     * @return string $word  "xIdzed" word
+     */
+    public static function propertyName2x($propertyName, $x)
+    {
+        $camelized = preg_replace('#'.$x.'$#', '', $propertyName);
 
         return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '.$1', $camelized));
     }

@@ -28,7 +28,8 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\DocParser;
 
 /**
- * AnnotationReaderDecorator decorates core AnnotationReader
+ * AnnotationReaderDecorator serves as a facade to the doctrine core 
+ * AnnotationReader.
  *
  * @author joshi
  */
