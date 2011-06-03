@@ -4,6 +4,21 @@ README
 What`s NEW?
 -----------
 
+June '11:
+
+- Testcoverage
+
+- Support fine-graned configuration of services. The following configuraton 
+options are built-in:
+    
+    - Scope
+    - Tags
+    - Public true|false
+    - Abstract (by declaring the underlying class "abstract)
+    - File
+
+May '11:
+
 Supports inheritance by analyzing base classes. Technically, each @Service
 annotated child class is defined using a service DefinitionDecorator which holds 
 a reference to the parent service. This works recursivly until the root class
@@ -316,10 +331,13 @@ Example:
     /**
      * @Service(Id="my.service", Scope="container", "Tags"={"my.tag", "my.other.tag"}, File="myFileResource", Public="false")
      */
-    class myService
+    abstract class myService
     {
         // ...
     }
+
+Note that by using the "abstract" keyword, the service is automatically defined
+abstract, too!
 
 Comments are very appreciated! 
            
@@ -332,8 +350,8 @@ Needed, not (yet?) implemented features
 - Lazy-load dependencies
 - Bundle-Configuration
 - Time-optimized loading process
-- Test-Coverage
-- Documentation
+- Test-Coverage (partly done)
+- Documentation (partly done)
 - PHP-Doc
 
 
