@@ -92,7 +92,7 @@ definition-type by using the "@Inject"-annotation:
     private $entityManager;
 
     /**
-     * @Inject("%my.setting%")
+     * @Inject("%my.setting")
      */
     private $mySetting;
 
@@ -184,55 +184,36 @@ dependencies by analyzing the method signature.
 Instead of services you are also allowed to map DIC-Parameters or even plain 
 values.
 
-Annotations for fine-tuning the dependencies
---------------------------------------------
+Mandatory and optional references and parameters
+------------------------------------------------
 
-You may use the @Optional and @Strict dependencies to control how the DIC deals
-with them. Internally, @Optional controls exception handling when the service
-does not exist and @Strict sets how the service reference is validated by the
-DIC.
+By default, all autowired dependencies are NOT optional (mandatory).
 
-Example:
-        
+You may define service references as well as injected parameters as optional
+by prepending a question mark (like in the yaml service configuration files):
+
     /**
-     * @Strict(false)
-     * @Optional
-     * @Inject("@my.mighty.mailer")
+     * @Inject(mailer="@?my.mighty.mailer")
      */
     public function setEntityManager(
                      \Doctrine\ORM\EntityManager $em, 
-                     \Mailer $mailer, 
+                     \Mailer $mailer = null, 
     ) {
         $this->em = $em;
 
         $this->mailer = $mailer
     }
 
-or:
-    
     /**
-     * @Strict
-     * @Optional(false)
-     * @Inject("@my.mighty.mailer")
+     * @Inject("%?my.setting")
      */
-    public function setEntityManager(
-                     \Doctrine\ORM\EntityManager $em, 
-                     \Mailer $mailer, 
-    ) {
-        $this->em = $em;
+    private $mySetting;
 
-        $this->mailer = $mailer
-    }
-
-By default, all autowired dependencies are NOT optional (mandatory) and are
-validated Strict.
-
-Exception: Method arguments that have default values are automatically defined
-optional if not explicetly specified by an @Optional annotation.
-
+Note that when defining method arguments as optional, your method signature
+should provide a default value by using the PHP built-in polymorphic feature.
 
 Annotations for defining services
---------------------------------------------
+---------------------------------
 
 This is an extremely useful feature in combination with the autowiring stuff
 explained above. All you have to do is to define which classes are parsed
