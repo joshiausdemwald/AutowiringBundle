@@ -24,9 +24,12 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+
+use Doctrine\Common\Annotations\Reader;
 
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
 
@@ -37,6 +40,34 @@ use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
  */
 class PropertyInjector extends Injector
 {   
+    /**
+     * @var Boolean
+     */
+    protected $wireByName;
+    
+    /**
+     * @var String 
+     */
+    protected $nameSuffix;
+    
+    /**
+     * Constructor.
+     * 
+     * @see Inject:__construct()
+     * @param ContainerBuilder $container
+     * @param Reader $reader
+     * @param type $wire_by_name
+     * @param type $name_suffix 
+     */
+    public function __construct(ContainerBuilder $container, Reader $reader, $wire_by_name = true, $name_suffix = 'Service')
+    {
+        parent::__construct($container, $reader);
+        
+        $this->wireByName = $wire_by_name;
+        
+        $this->nameSuffix = $name_suffix;
+    }
+    
     protected function process(Definition $definition, \Reflector $property)
     {        
         $inject = null;
@@ -88,9 +119,11 @@ class PropertyInjector extends Injector
         }
 
         // GUESS BY NAMING CONVENTION
-        else
+        elseif(true === $this->wireByName)
         {
-            if ('Service' === substr($property->getName(), -7, 7))
+            $strlen = strlen($this->nameSuffix);
+            
+            if ($this->nameSuffix === substr($property->getName(), $strlen * -1, $strlen))
             {
                 $service_id = Inflector::propertyName2ServiceId($property->getName());
 

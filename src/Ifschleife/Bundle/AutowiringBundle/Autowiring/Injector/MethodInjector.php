@@ -24,8 +24,13 @@
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+
+use Doctrine\Common\Annotations\Reader;
+
+use Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper;
 
 /**
  * MethodInjector
@@ -34,6 +39,19 @@ use Symfony\Component\DependencyInjection\Parameter;
  */
 abstract class MethodInjector extends Injector
 {
+    /**
+     *
+     * @var ClassnameMapper
+     */
+    protected $classNameMapper;
+    
+    public function __construct(ContainerBuilder $container, Reader $reader, ClassnameMapper $classnameMapper)
+    {
+        parent::__construct($container, $reader);
+        
+        $this->classnameMapper = $classnameMapper;
+    }
+    
     /**
      * Guesses arguments size and types by analyzing the to-inject method
      * signature.
@@ -115,7 +133,7 @@ abstract class MethodInjector extends Injector
                 }
                 else
                 {   
-                    $service_id = $this->getClassNameMapper()->resolveService($type->getName());
+                    $service_id = $this->classnameMapper->resolveService($type->getName());
 
                     if (null === $service_id)
                     {

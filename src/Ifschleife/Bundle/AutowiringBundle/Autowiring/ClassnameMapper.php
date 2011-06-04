@@ -267,6 +267,16 @@ class ClassnameMapper
     }
     
     /**
+     * Returns the DIC
+     * 
+     * @return Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+    
+    /**
      * Resolves a single parameter which can be a concrete value (string) or a
      * placeholder like "%service.x.y.class_name%". If a placeholder is given,
      * it´s first matching value will be returned.

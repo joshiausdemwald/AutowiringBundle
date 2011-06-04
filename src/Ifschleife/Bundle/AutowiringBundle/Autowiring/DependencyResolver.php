@@ -25,9 +25,6 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Doctrine\Common\Annotations\Reader;
-
-use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
 
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\Injector;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector;
@@ -50,9 +47,9 @@ class DependencyResolver
     private $container;
     
     /**
-     * @var boolean
+     * @var ClassnameMapper
      */
-    private $isInitialized;
+    private $classnameMapper;
     
     /**
      * @var ConstructorInjector
@@ -70,44 +67,22 @@ class DependencyResolver
     private $setterInjector;
     
     /**
-     * @var ClassnameMapper;
-     */
-    private $classNameMapper;
-    
-    /**
-     * Constructor
+     * Constructor. 
      * 
-     * @param ContainerBuilder $container: The container builder
+     * @param ContainerBuilder $container
+     * @param PropertyInjector $property_injector
+     * @param ConstructorInjector $constructor_injector
+     * @param SetterInjector $setter_injector 
      */
-    public function __construct(ContainerBuilder $container, Reader $reader = null)
+    public function __construct(ContainerBuilder $container, ClassnameMapper $classname_mapper, PropertyInjector $property_injector, ConstructorInjector $constructor_injector, SetterInjector $setter_injector)
     {
-        $this->container = $container;
-        
-        $reader = null === $reader ? new AnnotationReaderDecorator() : $reader;
-        
-        $this->propertyInjector     = new PropertyInjector($container, $reader);
-        $this->constructorInjector  = new ConstructorInjector($container, $reader);
-        $this->setterInjector       = new SetterInjector($container, $reader);
-        
-        $this->isInitialized = false;
+        $this->container            = $container;
+        $this->classnameMapper     = $classname_mapper;
+        $this->propertyInjector     = $property_injector;
+        $this->constructorInjector  = $constructor_injector;
+        $this->setterInjector       = $setter_injector;
     }
 
-    /**
-     * Initializes all instance variables.
-     * 
-     * @return void
-     */
-    public function initialize()
-    {
-        $this->classNameMapper = new ClassnameMapper($this->container);
-        
-        $this->propertyInjector->setClassNameMapper($this->classNameMapper);
-        $this->constructorInjector->setClassNameMapper($this->classNameMapper);
-        $this->setterInjector->setClassNameMapper($this->classNameMapper);
-        
-        $this->isInitialized = true;
-    }
-    
     /**
      * Starts the service resolving by analyzing the
      * service classes´s property and method annotations.
@@ -116,14 +91,7 @@ class DependencyResolver
      */
     public function resolve()
     {
-        if( ! $this->isInitialized)
-        {
-            $this->initialize();
-        }
-        
         $this->extendDefinitions();
-        
-        $this->isInitialized = false;
     }
 
     /**
@@ -135,9 +103,9 @@ class DependencyResolver
     private function extendDefinitions()
     {
         // ANALYZE SERVICES
-        foreach ($this->classNameMapper->getClasses() AS $class)
+        foreach ($this->classnameMapper->getClasses() AS $class)
         {
-            $service_id = $this->classNameMapper->getServiceId($class->getName());
+            $service_id = $this->classnameMapper->getServiceId($class->getName());
             
             // AMBIGUOUS CLASSNAMES ARE NOT ALLOWED TO BE PROCESSED ...
             if(false !== $service_id)

@@ -45,7 +45,7 @@ class AutowiringCompilerPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $dependencyResolver = new DependencyResolver($container);
+        $dependencyResolver = $container->get('autowiring.dependency_resolver');
         $dependencyResolver->resolve();
     }
 }

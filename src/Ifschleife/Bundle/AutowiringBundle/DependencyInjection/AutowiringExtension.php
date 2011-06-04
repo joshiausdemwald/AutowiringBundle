@@ -44,43 +44,50 @@ class AutowiringExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        $processor = new Processor();
-
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
-
-        $config = $processor->processConfiguration($configuration, $configs);
-
-        if (true === $config['enabled'])
-        {
-            $this->loadAutowiring($config, $container);
-            
-            $this->loadServices($container);
-        }
-    }
-
-    public function loadAutowiring(array $configs, ContainerBuilder $container)
-    {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-
         $loader->load('autowiring.xml');
+        
+        $processor = new Processor();
+        
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        
+        $config = $processor->processConfiguration($configuration, $configs);
+        
+        var_dump($config);
+        
+        $container->setParameter('autowiring.build_definitions', $config['build_definitions']);
+        
+        $container->setParameter('autowiring.property_injection', $config['property_injection']['enabled']);
+        $container->setParameter('autowiring.property_injection.wire_by_name', $config['property_injection']['wire_by_name']['enabled']);
+        $container->setParameter('autowiring.property_injection.name_suffix', $config['property_injection']['wire_by_name']['name_suffix']);
+        
+        $container->setParameter('autowiring.setter_injection', $config['setter_injection']['enabled']);
+        $container->setParameter('autowiring.setter_injection.wire_by_type', $config['setter_injection']['wire_by_type']);
+        
+        $container->setParameter('autowiring.constructor_injection', $config['constructor_injection']['enabled']);
+        $container->setParameter('autowiring.constructor_injection.wire_by_type', $config['constructor_injection']['wire_by_type']);
+        
+        $this->loadServices($container);
     }
-    
+
     /**
      * Loads the @Service defined services.
      * @todo configure this stuff.
      */
     public function loadServices(ContainerBuilder $container, array $paths = null)
     {
-        $serviceBuilder = new ServiceBuilder($container);
-        
-        $finder = new Finder();
+        if($container->getParameter('autowiring.build_definitions'))
+        {
+            $serviceBuilder = new ServiceBuilder($container);
+            $finder = new Finder();
 
-        $serviceBuilder->setFiles($finder
-            ->in($container->getParameter('kernel.root_dir') . '/../src/')
-            ->name('#.*?Controller\.php#i')
-        ->getIterator());
+            $serviceBuilder->setFiles($finder
+                ->in($container->getParameter('kernel.root_dir') . '/../src/')
+                ->name('#.*?Controller\.php#i')
+            ->getIterator());
 
-        $serviceBuilder->build();
+            $serviceBuilder->build();
+        }
     }
 
     /**
@@ -92,7 +99,12 @@ class AutowiringExtension extends Extension
     {
         return __DIR__ . '/../Resources/config/schema';
     }
-
+    
+    /**
+     * Returns the configuration extension namespace.
+     * 
+     * @return string
+     */
     public function getNamespace()
     {
         return 'http://ifschleife.de/schema/dic/autowiring';

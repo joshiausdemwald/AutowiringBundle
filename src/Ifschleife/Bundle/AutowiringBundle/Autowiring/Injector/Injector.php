@@ -30,7 +30,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use Doctrine\Common\Annotations\Reader;
 
-use Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper;
 
 /**
  * Injector
@@ -63,13 +62,6 @@ abstract class Injector
     protected $annotations;
     
     /**
-     *
-     * @var ClassnameMapper
-     */
-    protected $classNameMapper;
-    
-    
-    /**
      * Constructor.
      * 
      * @param \Reflector $reflector
@@ -93,32 +85,6 @@ abstract class Injector
         $this->annotations = $this->createAnnotationsMap((array)$this->readAnnotations($reflector));
         
         $this->process($definition, $reflector);
-    }
-    
-    /**
-     * Sets the class name mapper.
-     * 
-     * @param ClassNameMapper $mapper 
-     */
-    public function setClassNameMapper(ClassNameMapper $mapper)
-    {
-        $this->classNameMapper = $mapper;
-    }
-    
-    /**
-     * Returns the classNameMapper. If no mapper was assigned, a new instance
-     * will be created. WARNING: High CPU Usage!!
-     * 
-     * @return ClassNameMapper $classNameMapper
-     */
-    public function getClassNameMapper()
-    {
-        if(null === $this->classNameMapper)
-        {
-            $this->classNameMapper = new ClassnameMapper($this->container);
-        }
-        
-        return $this->classNameMapper;
     }
     
     /**

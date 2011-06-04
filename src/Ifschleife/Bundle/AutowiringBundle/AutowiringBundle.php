@@ -34,12 +34,11 @@ use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Compiler\AutowiringCo
  * @author joshi
  */
 class AutowiringBundle extends Bundle
-{
-
+{   
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-
+        
         $container->addCompilerPass(new AutowiringCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 }
