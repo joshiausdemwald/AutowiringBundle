@@ -59,12 +59,33 @@ class PropertyInjector extends Injector
      * @param type $wire_by_name
      * @param type $name_suffix 
      */
-    public function __construct(ContainerBuilder $container, Reader $reader, $wire_by_name = true, $name_suffix = 'Service')
+    public function __construct(ContainerBuilder $container, Reader $reader)
     {
         parent::__construct($container, $reader);
         
-        $this->wireByName = $wire_by_name;
+        $this->setWireByName(true);
         
+        $this->setNameSuffix('Service');
+    }
+    
+    /**
+     * Set to true to enable automatic wiring by name
+     * 
+     * @param boolean $wire_by_name 
+     */
+    public function setWireByName($wire_by_name)
+    {
+        $this->wireByName = $wire_by_name;
+    }
+    
+    /**
+     * Sets the name suffix for automatic wiring by name.
+     * Defaults to "Service".
+     * 
+     * @param String $name_suffix 
+     */
+    public function setNameSuffix($name_suffix)
+    {
         $this->nameSuffix = $name_suffix;
     }
     
@@ -117,7 +138,7 @@ class PropertyInjector extends Injector
                 $inject = new Parameter($this->addParameter($resource_name));
             }
         }
-
+        
         // GUESS BY NAMING CONVENTION
         elseif(true === $this->wireByName)
         {

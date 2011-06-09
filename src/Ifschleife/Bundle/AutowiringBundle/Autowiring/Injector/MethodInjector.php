@@ -45,12 +45,31 @@ abstract class MethodInjector extends Injector
      */
     protected $classNameMapper;
     
+    /**
+     * @var Boolean
+     */
+    protected $wireByType;
+    
     public function __construct(ContainerBuilder $container, Reader $reader, ClassnameMapper $classnameMapper)
     {
         parent::__construct($container, $reader);
         
         $this->classnameMapper = $classnameMapper;
+        
+        $this->setWireByType(true);
     }
+    
+    /**
+     * Set to true to enabled type wiring,
+     * otherwise false.
+     * 
+     * @param boolean $wire_by_type 
+     */
+    public function setWireByType($wire_by_type)
+    {
+        $this->wireByType = $wire_by_type;
+    }
+    
     
     /**
      * Guesses arguments size and types by analyzing the to-inject method
@@ -112,7 +131,7 @@ abstract class MethodInjector extends Injector
                     $arguments[] = new Parameter($this->addParameter($resource_name));
                 }
             }
-            else
+            elseif(true === $this->wireByType)
             {
                 $type = null;
                 

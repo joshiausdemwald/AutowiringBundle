@@ -199,6 +199,36 @@ dependencies by analyzing the method signature.
 Instead of services you are also allowed to map DIC-Parameters or even plain 
 values.
 
+Configuration
+-------------
+
+app/config/app.yml:
+
+autowiring: 
+    enabled: true               # set to false to disable all functionality
+    build_definitions:          # Do build services
+        enabled: true
+        files:
+            controllers:
+                pathnames: *
+                pattern: *Controller.php
+    property_injection:         # Do property injection
+        enabled: true
+        wire_by_name:
+            enabled: true
+            name_suffix: Service
+    constructor_injection:      # Do constructor injection
+        enabled: true
+        wire_by_type: true
+    setter_injection:           # Do setter injection
+        enabled: true
+        wire_by_type: true
+
+You may ommit each of the configuration settings, all settings default to
+true. The bundle provides semantic configuration, see 
+AutowiringBundle/Resources/config/schema/autowiring-1.0.xsd
+
+
 Mandatory and optional references and parameters
 ------------------------------------------------
 
@@ -340,7 +370,7 @@ Note that by using the "abstract" keyword, the service is automatically defined
 abstract, too!
 
 Comments are very appreciated! 
-           
+
 
 Needed, not (yet?) implemented features
 ---------------------------------------
