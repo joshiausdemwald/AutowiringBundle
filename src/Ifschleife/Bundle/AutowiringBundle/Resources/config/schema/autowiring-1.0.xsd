@@ -5,7 +5,7 @@
     targetNamespace="http://ifschleife.de/schema/dic/autowiring"
     elementFormDefault="qualified" 
 >
-    <xsd:element name="config" type="config">
+    <xsd:element name="config" type="config" minOccurs="1" maxOccurs="1">
         <xsd:complexType>
             <xsd:attribute ref="enabled" />
             <xsd:sequence>

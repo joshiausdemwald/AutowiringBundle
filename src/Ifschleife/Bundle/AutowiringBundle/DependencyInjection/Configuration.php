@@ -89,7 +89,7 @@ class Configuration implements ConfigurationInterface
                                     {
                                         if(null !== $definition)
                                         {
-                                            $path = array_key_exists('path', $definition) ? $definition['name'] : $path;
+                                            $path = array_key_exists('name', $definition) ? $definition['name'] : $path;
                                         }
                                         
                                         // IS BUNDLE REFERENCE?

@@ -213,26 +213,26 @@ app/config/app.yml:
                 filename_pattern: "*Controller.php"
 
 This configuration will use proper default values and will register all
-matching *Controller.php files as services.
+matching *Controller.php files that reside in the /src folder as services.
 
 Full fledged configuration example:
 
 app/config/app.yml:
 
     autowiring: 
-        enabled: true               # set to false to disable all functionality
+        enabled: true # set to false to disable all functionality
         build_definitions:
-            enabled: true           # set false to entirely disable definition building
+            enabled: true # set false to entirely disable definition building
             paths:
-                "%kernel.root_dir%/../src":                  # Register all controllers
+                "%kernel.root_dir%/../src": # Register all controllers
                     filename_pattern: "*Controller.php"
                     recursive: true
                 
-                "@AcmeDemoBundle":                          # Register only controllers in acme bundle
-                     filename_pattern: "*Controller.php"
+                "@AcmeDemoBundle": # Register only controllers in acme bundle
+                    filename_pattern: "*Controller.php"
                     recursive: true
                 
-                "@AcmeDemoBundle/Controller/MyController.php": ~           # Register a single file
+                "@AcmeDemoBundle/Controller/MyController.php": ~ # Register a single file
 
         build_definitions:          # Do build services
             enabled: true
@@ -251,6 +251,50 @@ app/config/app.yml:
         setter_injection:           # Do setter injection
             enabled: true
             wire_by_type: true
+
+Or in XML-Format:
+
+app/config/autowiring.xml:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <container 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
+    >
+
+        <autowiring:config enabled="true">
+            <autowiring:build-definitions>
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@IfschleifeWebsiteBundle">
+                </autowiring:path>
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AutowiringBundle">
+                </autowiring:path>
+            </autowiring:build-definitions>
+
+            <autowiring:property-injection 
+                enabled="true"
+                wire-by-name="true" 
+                name-suffix="Service" 
+            />
+
+            <autowiring:setter-injection 
+                enabled="true" 
+                wire-by-type="true" 
+            />
+
+            <autowiring:constructor-injection 
+                enabled="true"
+                wire-by-type="true" 
+            />
+        </autowiring:config> 
+    </container>
+
 
 You may ommit each of the configuration settings, all settings default to
 true. The bundle provides semantic configuration, see 
