@@ -5,7 +5,7 @@
     targetNamespace="http://ifschleife.de/schema/dic/autowiring"
     elementFormDefault="qualified" 
 >
-    <xsd:element name="config" type="config"  minOccurs="0" maxOccurs="1">
+    <xsd:element name="config" type="config">
         <xsd:complexType>
             <xsd:attribute ref="enabled" />
             <xsd:sequence>
@@ -42,59 +42,47 @@
     </xsd:element>
     
     <xsd:attributeGroup name="pathAttributes">
-        <xsd:attribute name="filename-pattern" type="string" />
-        <xsd:attribute name="recursive" type="boolean" default="true" />
-        <xsd:attribute name="name" type="string" />
+        <xsd:attribute name="filename-pattern" type="xsd:string" />
+        <xsd:attribute name="recursive" type="xsd:boolean" default="true" />
+        <xsd:attribute name="name" type="xsd:string" />
     </xsd:attributeGroup>
     
     <xsd:element name="property-injection">
         <xsd:complexType>
-            <xsd:attribute ref="enabled" />
-            <xsd:sequence>
-                <xsd:element ref="wire-by-name" minOccurs="0" maxOccurs="1" />
-            </xsd:sequence>
+            <xsd:attributeGroup ref="propertyInjectionAttributes" />
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="wire-by-name">
-        <xsd:complexType>
-            <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
-            <xsd:sequence>
-                <xsd:element ref="name-suffix" minOccurs="0" maxOccurs="1" />
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:attributeGroup name="propertyInjectionAttributes">
+        <xsd:attribute ref="enabled" />
+        <xsd:attribute name="wire-by-name" default="true" type="xsd:boolean" />
+        <xsd:attribute name="name-suffix" default="Service" type="name-suffix" />
+    </xsd:attributeGroup>
     
-    <xsd:element name="name-suffix">
-        <xsd:simpleType name="name-suffix">
-            <xsd:restriction base="xsd:string">
-                <xsd:minLength value="1" />
-                <xsd:maxLength value="50"/>
-                <xsd:pattern value="[A-Z][a-z]*" />
-            </xsd:restriction>
-        </xsd:simpleType>
-    </xsd:element>
+    <xsd:simpleType name="name-suffix">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="50"/>
+            <xsd:pattern value="[A-Z][a-z]*" />
+        </xsd:restriction>
+    </xsd:simpleType>
     
     <xsd:element name="setter-injection">
         <xsd:complexType>
             <xsd:attribute ref="enabled" />
-            <xsd:sequence>
-                <xsd:element ref="wire-by-type" minOccurs="0" maxOccurs="1"/>
-            </xsd:sequence>
+            <xsd:attribute ref="wire-by-type" />
         </xsd:complexType>
     </xsd:element>
     
     <xsd:element name="constructor-injection">
         <xsd:complexType>
             <xsd:attribute ref="enabled" />
-            <xsd:sequence>
-                <xsd:element ref="wire-by-type" minOccurs="0" maxOccurs="1" />
-            </xsd:sequence>
+            <xsd:attribute ref="wire-by-type" />
         </xsd:complexType>
     </xsd:element>
     
     <xsd:attribute name="enabled" type="xsd:boolean" default="true" />
     
-    <xsd:element name="wire-by-type" type="xsd:boolean" default="true" />
+    <xsd:attribute name="wire-by-type" type="xsd:boolean" default="true" />
     
 </xsd:schema>

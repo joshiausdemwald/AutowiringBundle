@@ -58,17 +58,17 @@ class AutowiringExtension extends Extension
         
         $container->setParameter('autowiring.config.enabled', $config['enabled']);
         
-        $container->setParameter('autowiring.config.build_definitions', $config['build_definitions']['enabled']);
+        $container->setParameter('autowiring.config.build_definitions.enabled', $config['build_definitions']['enabled']);
         $container->setParameter('autowiring.config.build_definitions.paths', $config['build_definitions']['paths']);
         
-        $container->setParameter('autowiring.config.property_injection', $config['property_injection']['enabled']);
-        $container->setParameter('autowiring.config.property_injection.wire_by_name', $config['property_injection']['wire_by_name']['enabled']);
-        $container->setParameter('autowiring.config.property_injection.name_suffix', $config['property_injection']['wire_by_name']['name_suffix']);
+        $container->setParameter('autowiring.config.property_injection.enabled', $config['property_injection']['enabled']);
+        $container->setParameter('autowiring.config.property_injection.wire_by_name', $config['property_injection']['wire_by_name']);
+        $container->setParameter('autowiring.config.property_injection.name_suffix', $config['property_injection']['name_suffix']);
         
-        $container->setParameter('autowiring.config.setter_injection', $config['setter_injection']['enabled']);
+        $container->setParameter('autowiring.config.setter_injection.enabled', $config['setter_injection']['enabled']);
         $container->setParameter('autowiring.config.setter_injection.wire_by_type', $config['setter_injection']['wire_by_type']);
         
-        $container->setParameter('autowiring.config.constructor_injection', $config['constructor_injection']['enabled']);
+        $container->setParameter('autowiring.config.constructor_injection.enabled', $config['constructor_injection']['enabled']);
         $container->setParameter('autowiring.config.constructor_injection.wire_by_type', $config['constructor_injection']['wire_by_type']);
         
         $this->loadServices($container, $bundles);
@@ -80,7 +80,7 @@ class AutowiringExtension extends Extension
      */
     public function loadServices(ContainerBuilder $container, array $bundles)
     {
-        if($container->getParameter('autowiring.config.enabled') && $container->getParameter('autowiring.config.build_definitions'))
+        if($container->getParameter('autowiring.config.enabled') && $container->getParameter('autowiring.config.build_definitions.enabled'))
         {
             $serviceBuilder = new ServiceBuilder($container);
 
