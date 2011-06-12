@@ -118,7 +118,7 @@ class AutowiringExtension extends Extension
             
             return $finder->getIterator();
         }
-        elseif(file_exists($path))
+        elseif(is_file($path))
         {
             return new \ArrayIterator(array($path));
         }
