@@ -11,6 +11,7 @@
         <parameter key="autowiring.property_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector</parameter>
         <parameter key="autowiring.setter_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\SetterInjector</parameter>
         <parameter key="autowiring.constructor_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ConstructorInjector</parameter>
+        <parameter key="autowiring.container_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector</parameter>
         <parameter key="autowiring.dependency_resolver.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver</parameter>
         <parameter key="autowiring.classname_mapper.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper</parameter>
     </parameters>
@@ -60,6 +61,10 @@
             <call method="setNameSuffix">
                 <argument>%autowiring.config.property_injection.name_suffix%</argument>
             </call>
+        </service>
+        
+        <service parent="autowiring.injector" id="autowiring.container_injector" class="%autowiring.container_injector.class%">
+            
         </service>
         
         <service id="autowiring.dependency_resolver" class="%autowiring.dependency_resolver.class%" public="true">
