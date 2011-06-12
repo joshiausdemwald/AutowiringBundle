@@ -45,6 +45,7 @@ class AutowiringExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        
         $loader->load('autowiring.xml');
         
         $processor = new Processor();
@@ -56,6 +57,7 @@ class AutowiringExtension extends Extension
         $container->setParameter('autowiring.config.enabled', $config['enabled']);
         
         $container->setParameter('autowiring.config.build_definitions', $config['build_definitions']['enabled']);
+        $container->setParameter('autowiring.config.build_definitions.paths', $config['build_definitions']['paths']);
         
         $container->setParameter('autowiring.config.property_injection', $config['property_injection']['enabled']);
         $container->setParameter('autowiring.config.property_injection.wire_by_name', $config['property_injection']['wire_by_name']['enabled']);
@@ -79,15 +81,76 @@ class AutowiringExtension extends Extension
         if($container->getParameter('autowiring.config.enabled') && $container->getParameter('autowiring.config.build_definitions'))
         {
             $serviceBuilder = new ServiceBuilder($container);
-            $finder = new Finder();
 
-            $serviceBuilder->setFiles($finder
-                ->in($container->getParameter('kernel.root_dir') . '/../src/')
-                ->name('#.*?Controller\.php#i')
-            ->getIterator());
-
+            $bundles = $container->getParameter('kernel.bundles');
+            
+            $iterator = new \AppendIterator();
+            
+            foreach($container->getParameter('autowiring.config.build_definitions.paths') as $path => $parameters)
+            {
+                // IS BUNDLE REFERENCE?
+                if(preg_match('#^@(.[^/]+)(.*?)$#', $path, $results))
+                {
+                    $bundle_name = $results[1];
+                    $path_suffix = $results[2];
+                    
+                    if( !array_key_exists($bundle_name, $bundles))
+                    {
+                        throw new Loader\BundleNotFoundException(sprintf('Bundle "%s" could not be found or has not been registered in AppKernel.php. Please check your configuration.', $bundle_name));
+                    }
+                    
+                    $bundle_classname = $bundles[$bundle_name];
+                    
+                    try 
+                    {
+                        $class = new \ReflectionClass($bundle_classname);
+                        
+                        $iterator->append($this->loadPath(dirname($class->getFilename() . $path_suffix), $parameters['recursive'], $parameters['filename_pattern']));
+                    }
+                    catch(\Exception $e)
+                    {
+                        throw new Loader\BundleLoadErrorException(sprintf('Bundle "%s" could not be loaded.', $bundle_classname), null, $e);
+                    }
+                }
+                else
+                {
+                    $iterator->append($this->loadPath($path, $parameters['recursive'], $parameters['filename_pattern']));
+                }
+            }
+            
+            $serviceBuilder->setFiles($iterator);
             $serviceBuilder->build();
         }
+    }
+    
+    /**
+     * Loads a path to register as services.
+     * 
+     * @param string $path: An absolute path
+     * @param boolean $recursive: Whether to search subdirectories
+     * @param string $filename_pattern: A regular expression/glob filename pattern.
+     * @return Iterator
+     */
+    private function loadPath($path, $recursive, $filename_pattern)
+    {
+        if(is_dir($path))
+        {
+            $finder = new Finder();
+            $finder->files()->in($path)->name($filename_pattern);
+            
+            if( ! $recursive)
+            {
+              $finder->depth(0);
+            }
+            
+            return $finder->getIterator();
+        }
+        elseif(file_exists($path))
+        {
+            return new \ArrayIterator(array($path));
+        }
+        
+        throw new Loader\FileNotFoundException(sprintf('File "%s" could not be found or is read protected.', $path));
     }
 
     /**

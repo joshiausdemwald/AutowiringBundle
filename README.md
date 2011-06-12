@@ -206,6 +206,22 @@ app/config/app.yml:
 
     autowiring: 
         enabled: true               # set to false to disable all functionality
+        build_definitions:
+            enabled: true           # set false to entirely disable definition building
+            paths:
+                -
+                    name: %kernel.root_dir%/../src       # Register all controllers
+                    filename_pattern: "*Controller.php"
+                    recursive: true
+                
+                -
+                    name: "@AcmeDemoBundle"              # Register only controllers in acme bundle
+                     filename_pattern: "*Controller.php"
+                    recursive: true
+                
+                - 
+                    name: "@AcmeDemoBundle/filename.php" # Register a single file
+
         build_definitions:          # Do build services
             enabled: true
             files:
