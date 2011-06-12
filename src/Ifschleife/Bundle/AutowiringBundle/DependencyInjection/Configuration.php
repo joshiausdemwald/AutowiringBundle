@@ -37,12 +37,19 @@ class Configuration implements ConfigurationInterface
     private $debug;
 
     /**
+     * @var array $bundles: All registered bundles
+     */
+    private $bundles;
+    
+    /**
      * Constructor
      *
      * @param Boolean $debug Whether to use the debug mode
      */
-    public function __construct($debug)
+    public function __construct($debug, array $bundles)
     {
+        $this->bundles = $bundles;
+        
         $this->debug = (Boolean) $debug;
     }
 
@@ -55,8 +62,10 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         
+        $bundles = $this->bundles; 
+        
         $rootNode = $treeBuilder->root('autowiring');
-
+        
         $rootNode
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
@@ -70,9 +79,71 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('enabled')->defaultTrue()->end()
                         ->arrayNode('paths')
                             ->useAttributeAsKey('name')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function($paths) use ($bundles)
+                                {
+                                    $retVal = array();
+                                    
+                                    foreach($paths AS $path => $definition)
+                                    {
+                                        if(null !== $definition)
+                                        {
+                                            $path = array_key_exists('path', $definition) ? $definition['name'] : $path;
+                                        }
+                                        
+                                        // IS BUNDLE REFERENCE?
+                                        if(preg_match('#^@(.[^/]+)(.*?)$#', $path, $results))
+                                        {
+                                            $bundle_name = $results[1];
+                                            $path_suffix = $results[2];
+
+                                            if( ! array_key_exists($bundle_name, $bundles))
+                                            {   
+                                                throw new Loader\BundleNotFoundException(sprintf('Bundle "%s" could not be found or has not been registered in AppKernel.php. Please check your configuration.', $bundle_name));
+                                            }
+
+                                            $bundle_classname = $bundles[$bundle_name];
+
+                                            try 
+                                            {
+                                                $class = new \ReflectionClass($bundle_classname);
+                                                
+                                                $fixed_pathname = dirname($class->getFilename()) . $path_suffix;
+                                                
+                                                $definition['pathname'] = $fixed_pathname;
+                                                        
+                                                $retVal[$fixed_pathname] = $definition;
+                                            }
+                                            catch(\Exception $e)
+                                            {
+                                                throw new Loader\BundleLoadErrorException(sprintf('Bundle "%s" could not be loaded.', $bundle_classname), null, $e);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $definition['pathname'] = $path;
+                                            
+                                            $retVal[$path] = $definition;
+                                        }
+                                    }
+                                    return $retVal;
+                                })
+                            ->end()
                             ->prototype('array')
+                                ->validate()
+                                    ->ifTrue(function($definition) {
+                                        return ! file_exists($definition['pathname']) || !is_readable($definition['pathname']);
+                                    })
+                                    ->thenInvalid('Pathname at "%s" does not exist or is read-protected.')
+                                    ->ifTrue(function($definition) {
+                                        return is_dir($definition['pathname'] && ! array_key_exists('filename_pattern', $definition));
+                                    })
+                                    ->thenInvalid('You must specify a filename_pattern for directories at configuration "%s".')
+                                ->end()
                                 ->children()
-                                    ->scalarNode('filename_pattern')->isRequired()->end()
+                                    ->scalarNode('filename_pattern')->end()
+                                    ->scalarNode('pathname')->isRequired()->end()
                                     ->booleanNode('recursive')->defaultTrue()->end()
                                 ->end()
                             ->end()

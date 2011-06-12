@@ -50,7 +50,9 @@ class AutowiringExtension extends Extension
         
         $processor = new Processor();
         
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $bundles = $container->getParameter('kernel.bundles');
+        
+        $configuration = new Configuration($container->getParameter('kernel.debug'), $bundles);
         
         $config = $processor->processConfiguration($configuration, $configs);
         
@@ -69,53 +71,24 @@ class AutowiringExtension extends Extension
         $container->setParameter('autowiring.config.constructor_injection', $config['constructor_injection']['enabled']);
         $container->setParameter('autowiring.config.constructor_injection.wire_by_type', $config['constructor_injection']['wire_by_type']);
         
-        $this->loadServices($container);
+        $this->loadServices($container, $bundles);
     }
 
     /**
      * Loads the @Service defined services.
      * @todo configure this stuff.
      */
-    public function loadServices(ContainerBuilder $container, array $paths = null)
+    public function loadServices(ContainerBuilder $container, array $bundles)
     {
         if($container->getParameter('autowiring.config.enabled') && $container->getParameter('autowiring.config.build_definitions'))
         {
             $serviceBuilder = new ServiceBuilder($container);
 
-            $bundles = $container->getParameter('kernel.bundles');
-            
             $iterator = new \AppendIterator();
             
-            foreach($container->getParameter('autowiring.config.build_definitions.paths') as $path => $parameters)
+            foreach($container->getParameter('autowiring.config.build_definitions.paths') as $parameters)
             {
-                // IS BUNDLE REFERENCE?
-                if(preg_match('#^@(.[^/]+)(.*?)$#', $path, $results))
-                {
-                    $bundle_name = $results[1];
-                    $path_suffix = $results[2];
-                    
-                    if( !array_key_exists($bundle_name, $bundles))
-                    {
-                        throw new Loader\BundleNotFoundException(sprintf('Bundle "%s" could not be found or has not been registered in AppKernel.php. Please check your configuration.', $bundle_name));
-                    }
-                    
-                    $bundle_classname = $bundles[$bundle_name];
-                    
-                    try 
-                    {
-                        $class = new \ReflectionClass($bundle_classname);
-                        
-                        $iterator->append($this->loadPath(dirname($class->getFilename() . $path_suffix), $parameters['recursive'], $parameters['filename_pattern']));
-                    }
-                    catch(\Exception $e)
-                    {
-                        throw new Loader\BundleLoadErrorException(sprintf('Bundle "%s" could not be loaded.', $bundle_classname), null, $e);
-                    }
-                }
-                else
-                {
-                    $iterator->append($this->loadPath($path, $parameters['recursive'], $parameters['filename_pattern']));
-                }
+                $iterator->append($this->loadPath($parameters['pathname'], $parameters['recursive'], array_key_exists('filename_pattern', $parameters) ? $parameters['filename_pattern'] : null));
             }
             
             $serviceBuilder->setFiles($iterator);
@@ -131,7 +104,7 @@ class AutowiringExtension extends Extension
      * @param string $filename_pattern: A regular expression/glob filename pattern.
      * @return Iterator
      */
-    private function loadPath($path, $recursive, $filename_pattern)
+    private function loadPath($path, $recursive = null, $filename_pattern = null)
     {
         if(is_dir($path))
         {
@@ -150,7 +123,7 @@ class AutowiringExtension extends Extension
             return new \ArrayIterator(array($path));
         }
         
-        throw new Loader\FileNotFoundException(sprintf('File "%s" could not be found or is read protected.', $path));
+        throw new Loader\FileNotFoundException(sprintf('File or directory "%s" could not be found or is read protected.', $path));
     }
 
     /**

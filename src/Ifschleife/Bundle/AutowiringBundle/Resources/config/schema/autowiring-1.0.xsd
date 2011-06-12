@@ -7,8 +7,8 @@
 >
     <xsd:element name="config" type="config"  minOccurs="0" maxOccurs="1">
         <xsd:complexType>
+            <xsd:attribute ref="enabled" />
             <xsd:sequence>
-                <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
                 <xsd:element ref="build-definitions" minOccurs="0" maxOccurs="1" />
                 <xsd:element ref="property-injection" minOccurs="0" maxOccurs="1" />
                 <xsd:element ref="setter-injection"  minOccurs="0" maxOccurs="1" />
@@ -19,16 +19,38 @@
     
     <xsd:element name="build-definitions">
         <xsd:complexType>
+            <xsd:attribute ref="enabled" />
             <xsd:sequence>
-                <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
+                <xsd:element ref="path" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element ref="paths" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="property-injection">
+    <xsd:element name="paths">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
+                <xsd:element ref="path" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="path">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="pathAttributes" />
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:attributeGroup name="pathAttributes">
+        <xsd:attribute name="filename-pattern" type="string" />
+        <xsd:attribute name="recursive" type="boolean" default="true" />
+        <xsd:attribute name="name" type="string" />
+    </xsd:attributeGroup>
+    
+    <xsd:element name="property-injection">
+        <xsd:complexType>
+            <xsd:attribute ref="enabled" />
+            <xsd:sequence>
                 <xsd:element ref="wire-by-name" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
@@ -36,8 +58,8 @@
     
     <xsd:element name="wire-by-name">
         <xsd:complexType>
+            <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
             <xsd:sequence>
-                <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
                 <xsd:element ref="name-suffix" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
@@ -55,8 +77,8 @@
     
     <xsd:element name="setter-injection">
         <xsd:complexType>
+            <xsd:attribute ref="enabled" />
             <xsd:sequence>
-                <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
                 <xsd:element ref="wire-by-type" minOccurs="0" maxOccurs="1"/>
             </xsd:sequence>
         </xsd:complexType>
@@ -64,14 +86,14 @@
     
     <xsd:element name="constructor-injection">
         <xsd:complexType>
+            <xsd:attribute ref="enabled" />
             <xsd:sequence>
-                <xsd:element ref="enabled" minOccurs="0" maxOccurs="1" />
                 <xsd:element ref="wire-by-type" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="enabled" type="xsd:boolean" default="true" />
+    <xsd:attribute name="enabled" type="xsd:boolean" default="true" />
     
     <xsd:element name="wire-by-type" type="xsd:boolean" default="true" />
     

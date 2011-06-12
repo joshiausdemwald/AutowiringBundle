@@ -202,6 +202,21 @@ values.
 Configuration
 -------------
 
+Minimum configuration:
+
+app/config/app.yml:
+
+    autowiring: 
+        build_definitions:
+            path:
+                name: %kernel.root_dir%/../src
+                filename_pattern: "*Controller.php"
+
+This configuration will use proper default values and will register all
+matching *Controller.php files as services.
+
+Full fledged configuration example:
+
 app/config/app.yml:
 
     autowiring: 
@@ -209,18 +224,15 @@ app/config/app.yml:
         build_definitions:
             enabled: true           # set false to entirely disable definition building
             paths:
-                -
-                    name: %kernel.root_dir%/../src       # Register all controllers
+                "%kernel.root_dir%/../src":                  # Register all controllers
                     filename_pattern: "*Controller.php"
                     recursive: true
                 
-                -
-                    name: "@AcmeDemoBundle"              # Register only controllers in acme bundle
+                "@AcmeDemoBundle":                          # Register only controllers in acme bundle
                      filename_pattern: "*Controller.php"
                     recursive: true
                 
-                - 
-                    name: "@AcmeDemoBundle/filename.php" # Register a single file
+                "@AcmeDemoBundle/Controller/MyController.php": ~           # Register a single file
 
         build_definitions:          # Do build services
             enabled: true
