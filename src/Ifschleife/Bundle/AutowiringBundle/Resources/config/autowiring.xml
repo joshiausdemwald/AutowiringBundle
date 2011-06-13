@@ -62,8 +62,11 @@
             <call method="setWireByName">
                 <argument>%autowiring.config.property_injection.wire_by_name%</argument>
             </call>
-            <call method="setNameSuffix">
-                <argument>%autowiring.config.property_injection.name_suffix%</argument>
+            <call method="setServiceNameSuffix">
+                <argument>%autowiring.config.property_injection.service_name_suffix%</argument>
+            </call>
+            <call method="setParameterNameSuffix">
+                <argument>%autowiring.config.property_injection.parameter_name_suffix%</argument>
             </call>
         </service>
         

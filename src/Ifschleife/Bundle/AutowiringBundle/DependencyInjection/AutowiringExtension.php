@@ -63,7 +63,8 @@ class AutowiringExtension extends Extension
         
         $container->setParameter('autowiring.config.property_injection.enabled', $config['property_injection']['enabled']);
         $container->setParameter('autowiring.config.property_injection.wire_by_name', $config['property_injection']['wire_by_name']);
-        $container->setParameter('autowiring.config.property_injection.name_suffix', $config['property_injection']['name_suffix']);
+        $container->setParameter('autowiring.config.property_injection.service_name_suffix', $config['property_injection']['service_name_suffix']);
+        $container->setParameter('autowiring.config.property_injection.parameter_name_suffix', $config['property_injection']['service_name_suffix']);
         
         $container->setParameter('autowiring.config.setter_injection.enabled', $config['setter_injection']['enabled']);
         $container->setParameter('autowiring.config.setter_injection.wire_by_type', $config['setter_injection']['wire_by_type']);

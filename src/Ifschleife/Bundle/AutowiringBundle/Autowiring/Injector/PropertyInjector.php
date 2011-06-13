@@ -48,7 +48,12 @@ class PropertyInjector extends Injector
     /**
      * @var String 
      */
-    protected $nameSuffix;
+    protected $serviceNameSuffix;
+    
+    /**
+     * @var String 
+     */
+    protected $parameterNameSuffix;
     
     /**
      * Constructor.
@@ -56,8 +61,6 @@ class PropertyInjector extends Injector
      * @see Inject:__construct()
      * @param ContainerBuilder $container
      * @param Reader $reader
-     * @param type $wire_by_name
-     * @param type $name_suffix 
      */
     public function __construct(ContainerBuilder $container, Reader $reader)
     {
@@ -65,7 +68,9 @@ class PropertyInjector extends Injector
         
         $this->setWireByName(true);
         
-        $this->setNameSuffix('Service');
+        $this->setServiceNameSuffix('Service');
+        
+        $this->setParameterNameSuffix('Parameter');
     }
     
     /**
@@ -79,16 +84,35 @@ class PropertyInjector extends Injector
     }
     
     /**
-     * Sets the name suffix for automatic wiring by name.
+     * Sets the name suffix for automatic service wiring by name.
      * Defaults to "Service".
      * 
-     * @param String $name_suffix 
+     * @param String $service_name_suffix 
      */
-    public function setNameSuffix($name_suffix)
+    public function setServiceNameSuffix($service_name_suffix)
     {
-        $this->nameSuffix = $name_suffix;
+        $this->serviceNameSuffix = $service_name_suffix;
     }
     
+    /**
+     * Sets the name suffix for automatic parameter wiring by name.
+     * Defaults to "Parameter".
+     * 
+     * @param String $parameter_name_suffix 
+     */
+    public function setParameterNameSuffix($parameter_name_suffix)
+    {
+        $this->parameterNameSuffix = $parameter_name_suffix;
+    }
+    
+    /**
+     * Processes a property and assigns the correct
+     * service definitions.
+     * 
+     * @param Definition $definition
+     * @param \Reflector $property 
+     * @return void
+     */
     protected function process(Definition $definition, \Reflector $property)
     {        
         $inject = null;
@@ -128,7 +152,7 @@ class PropertyInjector extends Injector
                 }
                 else
                 {
-                    throw new UnresolvedParamterException(sprintf('Instance property "%s::$%s" could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $property->getDeclaringClass()->getName(), $property->getName(), $resouce_name));
+                    throw new UnresolvedParamterException(sprintf('Instance property "%s::$%s" could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $property->getDeclaringClass()->getName(), $property->getName(), $resource_name));
                 }
             }
             
@@ -142,11 +166,12 @@ class PropertyInjector extends Injector
         // GUESS BY NAMING CONVENTION
         elseif(true === $this->wireByName)
         {
-            $strlen = strlen($this->nameSuffix);
+            $strlen_service = strlen($this->serviceNameSuffix);
+            $strlen_parameter = strlen($this->parameterNameSuffix);
             
-            if ($this->nameSuffix === substr($property->getName(), $strlen * -1, $strlen))
+            if ($this->serviceNameSuffix === substr($property->getName(), $strlen_service * -1, $strlen_service))
             {
-                $service_id = Inflector::propertyName2ServiceId($property->getName());
+                $service_id = Inflector::propertyName2x($property->getName(), $this->serviceNameSuffix);
 
                 try 
                 {
@@ -159,9 +184,9 @@ class PropertyInjector extends Injector
                 
                 $inject = $this->createReference($service_id, false, true);
             }
-            elseif('Parameter' === substr($property->getName(), -9, 9))
+            elseif($this->parameterNameSuffix === substr($property->getName(), $strlen_parameter * -1, $strlen_parameter))
             {
-                $parameter_name = Inflector::propertyName2ParameterName($property->getName());
+                $parameter_name = Inflector::propertyName2x($property->getName(), $this->parameterNameSuffix);
                 
                 if( ! $this->container->hasParameter($parameter_name))
                 {

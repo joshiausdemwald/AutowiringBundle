@@ -59,7 +59,7 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         
         $propertyInjector    = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector($container, $reader);
         $propertyInjector->setWireByName(true);
-        $propertyInjector->setNameSuffix('Service');
+        $propertyInjector->setServiceNameSuffix('Service');
      
         $constructorInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ConstructorInjector($container, $reader, $classnameMapper);
         $constructorInjector->setWireByType(true);
