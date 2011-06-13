@@ -36,9 +36,18 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
 {
     function testConstruct()
     {
-        $containerBuilder = new ContainerBuilder;
+        $container = new ContainerBuilder;
         
-        $serviceBuilder = new ServiceBuilder($containerBuilder);        
+        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        
+        $loader  = new AnnotatedFileLoader(
+            $container,
+            new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, $reader),
+            new \Symfony\Component\Config\FileLocator(),
+            new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser()
+        );
+        
+        $serviceBuilder = new ServiceBuilder($loader);        
         
         $this->assertAttributeInstanceOf('Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader', 'loader', $serviceBuilder);
         
@@ -63,16 +72,25 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
      */
     function testBuilder(array $files)
     {
-        $containerBuilder = new ContainerBuilder;
+        $container = new ContainerBuilder;
         
-        $serviceBuilder = new ServiceBuilder($containerBuilder);
+        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        
+        $loader  = new AnnotatedFileLoader(
+            $container,
+            new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, $reader),
+            new \Symfony\Component\Config\FileLocator(),
+            new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser()
+        );
+        
+        $serviceBuilder = new ServiceBuilder($loader);    
         
         $serviceBuilder->setFiles($files);
         
         $serviceBuilder->build();
         
-        $this->assertTrue($containerBuilder->hasDefinition('ifschleife.bundle.autowiring_bundle.tests.fixtures.create_service_testclass1'));
-        $this->assertTrue($containerBuilder->hasDefinition('hans.wurst'));
+        $this->assertTrue($container->hasDefinition('ifschleife.bundle.autowiring_bundle.tests.fixtures.create_service_testclass1'));
+        $this->assertTrue($container->hasDefinition('hans.wurst'));
     }
     
     function files()

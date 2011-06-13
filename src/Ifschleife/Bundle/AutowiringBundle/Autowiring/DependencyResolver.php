@@ -77,7 +77,7 @@ class DependencyResolver
     public function __construct(ContainerBuilder $container, ClassnameMapper $classname_mapper, PropertyInjector $property_injector, ConstructorInjector $constructor_injector, SetterInjector $setter_injector)
     {
         $this->container            = $container;
-        $this->classnameMapper     = $classname_mapper;
+        $this->classnameMapper      = $classname_mapper;
         $this->propertyInjector     = $property_injector;
         $this->constructorInjector  = $constructor_injector;
         $this->setterInjector       = $setter_injector;

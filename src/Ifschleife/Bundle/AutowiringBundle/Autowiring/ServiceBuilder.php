@@ -23,8 +23,6 @@
 
 namespace Ifschleife\Bundle\AutowiringBundle\Autowiring;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Doctrine\Common\Annotations\Reader;
 
 use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader;
@@ -51,21 +49,11 @@ class ServiceBuilder
     /**
      * Constructor.
      * 
-     * @param ContainerBuilder $container 
+     * @param Loader $loader
      */
-    public function __construct(ContainerBuilder $container, AnnotatedFileLoader $loader = null)
+    public function __construct(AnnotatedFileLoader $loader = null)
     {
         $this->loader = $loader;
-        
-        if(null === $loader)
-        {
-            $this->loader = new AnnotatedFileLoader(
-                $container,
-                new \Symfony\Component\Config\FileLocator(),
-                new Parser\PhpParser,
-                new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator()
-            );
-        }
     }
     
     /**

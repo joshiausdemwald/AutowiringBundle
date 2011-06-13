@@ -12,8 +12,12 @@
         <parameter key="autowiring.setter_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\SetterInjector</parameter>
         <parameter key="autowiring.constructor_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ConstructorInjector</parameter>
         <parameter key="autowiring.container_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector</parameter>
+        <parameter key="autowiring.service_builder.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder</parameter>
+        <parameter key="autowiring.php_parser.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser</parameter>
+        <parameter key="autowiring.annotated_file_loader.class">Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader</parameter>
         <parameter key="autowiring.dependency_resolver.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver</parameter>
         <parameter key="autowiring.classname_mapper.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper</parameter>
+        <parameter key="autowiring.file_locator_class">Symfony\Component\Config\FileLocator</parameter>
     </parameters>
 
     <services>
@@ -23,12 +27,12 @@
             <argument type="service" id="service_container" />
         </service>
         
-        <service id="autowiring.injector" abstract="true" class="%autowiring.injector.class%">
+        <service id="autowiring.injector" abstract="true" class="%autowiring.injector.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="service" id="autowiring.annotation_reader" />
         </service>
         
-        <service parent="autowiring.injector" abstract="true" id="autowiring.method_injector">
+        <service parent="autowiring.injector" abstract="true" id="autowiring.method_injector" public="false">
             <argument type="service" id="service_container" />
             <argument type="service" id="autowiring.annotation_reader" />
             <argument type="service" id="autowiring.classname_mapper" />
@@ -63,8 +67,9 @@
             </call>
         </service>
         
-        <service parent="autowiring.injector" id="autowiring.container_injector" class="%autowiring.container_injector.class%">
-            
+        <service parent="autowiring.injector" id="autowiring.container_injector" class="%autowiring.container_injector.class%" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="autowiring.annotation_reader" />
         </service>
         
         <service id="autowiring.dependency_resolver" class="%autowiring.dependency_resolver.class%" public="true">
@@ -73,6 +78,21 @@
             <argument type="service" id="autowiring.property_injector" />
             <argument type="service" id="autowiring.constructor_injector" />
             <argument type="service" id="autowiring.setter_injector" />
+        </service>
+        
+        <service id="autowiring.php_parser" class="%autowiring.php_parser.class%" public="false" />
+            
+        <service id="autowiring.file_locator" class="%autowiring.file_locator_class%" public="false" />
+        
+        <service id="autowiring.annotated_file_loader" class="%autowiring.annotated_file_loader.class%" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="autowiring.container_injector" />
+            <argument type="service" id="autowiring.file_locator" />
+            <argument type="service" id="autowiring.php_parser" />
+        </service>
+        
+        <service id="autowiring.service_builder" class="%autowiring.service_builder.class%" public="true">
+            <argument type="service" id="autowiring.annotated_file_loader" />
         </service>
     </services>
 </container>

@@ -82,7 +82,7 @@ class AutowiringExtension extends Extension
     {
         if($container->getParameter('autowiring.config.enabled') && $container->getParameter('autowiring.config.build_definitions.enabled'))
         {
-            $serviceBuilder = new ServiceBuilder($container);
+            $serviceBuilder = $container->get('autowiring.service_builder');
 
             $iterator = new \AppendIterator();
             

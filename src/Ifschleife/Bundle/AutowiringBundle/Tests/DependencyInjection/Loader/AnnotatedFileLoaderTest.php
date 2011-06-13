@@ -50,7 +50,9 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $locator = new FileLocator();
         
-        $loader = new AnnotatedFileLoader($container, $locator, $parser, $reader);
+        $containerInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, $reader);
+        
+        $loader = new AnnotatedFileLoader($container, $containerInjector, $locator, $parser);
         
         $this->assertTrue($loader->supports($file));
     }
@@ -64,11 +66,13 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $parser = new PhpParser();
         
-        $reader = new AnnotationReaderDecorator;
+        $reader = new AnnotationReaderDecorator();
         
         $locator = new FileLocator();
         
-        $loader = new AnnotatedFileLoader($container, $locator, $parser, $reader);
+        $containerInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, $reader);
+        
+        $loader = new AnnotatedFileLoader($container, $containerInjector, $locator, $parser);
         
         $this->assertFalse($loader->supports($file));
     }

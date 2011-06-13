@@ -92,7 +92,7 @@ class PropertyInjector extends Injector
     protected function process(Definition $definition, \Reflector $property)
     {        
         $inject = null;
-        
+
         /* @var $property \ReflectionProperty */
         if ($this->hasAnnotation(self::ANNOTATION_INJECT))
         {

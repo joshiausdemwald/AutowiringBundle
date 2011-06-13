@@ -75,12 +75,15 @@ class AnnotatedFileLoader extends FileLoader
      * Constructor.
      * 
      * @param ContainerBuilder $container 
+     * @param ContainerInjector $containerInjector
+     * @param FileLocator $fileLocator
+     * @param PhpParser $phpParser
      */
-    public function __construct(ContainerBuilder $container, FileLocator $locator, PhpParser $parser, Reader $reader)
+    public function __construct(ContainerBuilder $container, ContainerInjector $containerInjector, FileLocator $locator, PhpParser $parser)
     {
-        $this->containerInjector = new ContainerInjector($container, $reader);
-
         $this->container = $container;
+        
+        $this->containerInjector = $containerInjector;
         
         $this->phpParser = $parser;
         
