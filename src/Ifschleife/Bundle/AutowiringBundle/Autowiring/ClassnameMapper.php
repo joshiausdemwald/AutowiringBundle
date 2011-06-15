@@ -76,9 +76,9 @@ class ClassnameMapper
 
         $this->parametersMap = array();
         
-        $this->resolveServices();
+        $this->collectServices();
 
-        $this->resolveAliases();
+        $this->collectAliases();
     }
     
     /**
@@ -106,7 +106,7 @@ class ClassnameMapper
      * @see initialize()
      * @return void
      */
-    private function resolveServices()
+    private function collectServices()
     {
         foreach ($this->container->getDefinitions() AS $id => $definition)
         {
@@ -114,7 +114,7 @@ class ClassnameMapper
             {
                 // Transform %service_class% to concrete class, regarding parent
                 // definitions.
-                $classname = $this->resolveClassname($definition);
+                $classname = $this->findClassname($definition);
                 
                 // AMBIGUOUS SERVICE, FLAG AS INVALID FOR LOOKUP
                 if(array_key_exists($classname, $this->classMap))
@@ -139,7 +139,7 @@ class ClassnameMapper
      * @see initialize()
      * @return void
      */
-    private function resolveAliases()
+    private function collectAliases()
     {
         foreach ($this->container->getAliases() AS $name => $alias_definition)
         {
@@ -161,7 +161,7 @@ class ClassnameMapper
                 {
                     // transform %service_class% to concrete class, regarding parent
                     // definitions.
-                    $classname = $this->resolveClassname($target_definition);
+                    $classname = $this->findClassname($target_definition);
 
                     // AMBIGUOUS SERVICE, FLAG AS INVALID FOR LOOKUP
                     if (array_key_exists($classname, $this->aliasMap))
@@ -178,17 +178,17 @@ class ClassnameMapper
     }
     
     /**
-     * Resolves the classname of a definition. If the given definition has no 
+     * Finds the classname of a definition. If the given definition has no 
      * classname, it´s parent definitions will be searched.
-     * Called by resolveServices() and resolveAliases() methods.
+     * Called by collectService() and collectAliases() methods.
      * 
-     * @see resolveServices()
-     * @see resolveAliases()
+     * @see collectServices()
+     * @see collectAliases()
      * @param Definition $definition
      * @return string $class_name: The name of the next matching class (concrete 
      * 							    implementation) for the definition.
      */
-    private function resolveClassname(Definition $definition)
+    private function findClassname(Definition $definition)
     {
         $classname = $definition->getClass();
         
@@ -211,11 +211,11 @@ class ClassnameMapper
                     return null;
                 }
 
-                return $this->resolveClassname($parent);
+                return $this->findClassname($parent);
             }
             elseif (null !== ($factory_class = $definition->getFactoryClass()))
             {
-                return $this->resolveClassname($factory_class);
+                return $this->findClassname($factory_class);
             }
         }
         
@@ -228,7 +228,7 @@ class ClassnameMapper
      * a placeholder like "%service.x.y.class_name%". If a placeholder is given,
      * it´s first matching value will be returned.
      * 
-     * @see resolveClassname()
+     * @see findClassname()
      * @see resolveParameter()
      * @param string $callout: The callout string.
      *
@@ -263,6 +263,33 @@ class ClassnameMapper
         {
             $service_id = $this->aliasMap[$typename];
         }
+        
+        // MIGHT BE AN INTERFACE
+        else
+        {
+            $type = new \ReflectionClass($typename);
+            
+            if($type->isInterface())
+            {
+                foreach ($this->classMap + $this->aliasMap AS $key => $id)
+                {
+                    $class = new \ReflectionClass($key);
+
+                    if($class->implementsInterface($type->getName()))
+                    {
+                        if($class->implementsInterface($type->getName()))
+                        {
+                            // service already resolved, ambiguous
+                            if(null !== $service_id)
+                            {
+                                return false;
+                            }
+                            $service_id = $id;
+                        }
+                    }
+                }
+            }
+        }
         return $service_id;
     }
     
@@ -281,7 +308,7 @@ class ClassnameMapper
      * placeholder like "%service.x.y.class_name%". If a placeholder is given,
      * it´s first matching value will be returned.
      * 
-     * @see resolveClassname()
+     * @see findClassname()
      * @param string $callout
      * 
      * @return mixed $parameter: The parameter or null if callout does not match to anyone.

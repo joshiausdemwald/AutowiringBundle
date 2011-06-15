@@ -138,18 +138,18 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertEquals(
-            'ifschleife.autowiring.testservice',
+            'autowiring.test_implementation',
             $methodCalls[0][1][0]->__toString()
         );
         
         $this->assertInstanceOf(
-            '\Symfony\Component\DependencyInjection\Parameter',
+            '\Symfony\Component\DependencyInjection\Reference',
             $methodCalls[1][1][0]
         );
         
-        $this->assertInstanceOf(
-            '\Symfony\Component\DependencyInjection\Parameter',
-            $methodCalls[1][1][1]
+        $this->assertEquals(
+            'ifschleife.autowiring.testservice',
+            $methodCalls[1][1][0]->__toString()
         );
         
         $this->assertInstanceOf(
@@ -163,7 +163,7 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertInstanceOf(
-            '\Symfony\Component\DependencyInjection\Reference',
+            '\Symfony\Component\DependencyInjection\Parameter',
             $methodCalls[3][1][0]
         );
         
@@ -173,23 +173,23 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertInstanceOf(
-            '\Symfony\Component\DependencyInjection\Parameter',
+            '\Symfony\Component\DependencyInjection\Reference',
             $methodCalls[4][1][0]
         );
         
         $this->assertInstanceOf(
-            '\Symfony\Component\DependencyInjection\Reference',
+            '\Symfony\Component\DependencyInjection\Parameter',
             $methodCalls[4][1][1]
         );
         
-        $this->assertEquals(
-            'foo',
-            $container->getParameter($methodCalls[1][1][0]->__toString())
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Parameter',
+            $methodCalls[5][1][0]
         );
         
-        $this->assertEquals(
-            'bar',
-            $container->getParameter($methodCalls[1][1][1]->__toString())
+        $this->assertInstanceOf(
+            '\Symfony\Component\DependencyInjection\Reference',
+            $methodCalls[5][1][1]
         );
         
         $this->assertEquals(
@@ -203,8 +203,8 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertEquals(
-            'ifschleife.autowiring.testservice',
-            $methodCalls[3][1][0]->__toString()
+            'foo',
+            $container->getParameter($methodCalls[3][1][0]->__toString())
         );
         
         $this->assertEquals(
@@ -213,13 +213,23 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertEquals(
+            'ifschleife.autowiring.testservice',
+            $methodCalls[4][1][0]->__toString()
+        );
+        
+        $this->assertEquals(
             'bar',
-            $container->getParameter($methodCalls[4][1][0]->__toString())
+            $container->getParameter($methodCalls[4][1][1]->__toString())
+        );
+        
+        $this->assertEquals(
+            'bar',
+            $container->getParameter($methodCalls[5][1][0]->__toString())
         );
         
         $this->assertEquals(
             'ifschleife.autowiring.testservice',
-            $methodCalls[4][1][1]->__toString()
+            $methodCalls[5][1][1]->__toString()
         );
     }
     
@@ -236,7 +246,8 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
                     // relevant files
                     __DIR__ . '/../Fixtures/ParentTestclass.php',
                     __DIR__ . '/../Fixtures/Testclass.php',
-                    __DIR__ . '/../Fixtures/Testservice.php'
+                    __DIR__ . '/../Fixtures/Testservice.php',
+                    __DIR__ . '/../Fixtures/TestImplementation.php',
                 ),
             ),
             array(
@@ -250,6 +261,7 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
                     __DIR__ . '/../Fixtures/Testclass.php',
                     __DIR__ . '/../Fixtures/Testservice.php',
                     __DIR__ . '/../Fixtures/ParentTestclass.php',
+                    __DIR__ . '/../Fixtures/TestImplementation.php',
                     
                 ),
             )

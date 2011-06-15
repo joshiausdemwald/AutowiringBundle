@@ -33,6 +33,8 @@ class Testclass extends ParentTestclass
     
     private $superparameterParameter;
     
+    private $testimplementation;
+    
     /**
      * @Inject
      * @param Testservice $testservice 
@@ -40,5 +42,20 @@ class Testclass extends ParentTestclass
     public function __construct(Testservice $testservice)
     {
         $this->testsvc = $testservice;
+    }
+    
+    /**
+     *
+     * @param TestInterface $testimplementation 
+     * @Inject
+     */
+    public function setTestImplementation(TestInterface $testimplementation)
+    {
+        $this->testimplementation = $testimplementation;
+    }
+    
+    public function getTestImplementation()
+    {
+        return $this->testimplementation;
     }
 }
