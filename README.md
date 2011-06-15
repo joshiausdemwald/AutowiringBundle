@@ -7,7 +7,7 @@ What`s NEW?
 2nd half of June '11:
 
 - Added the ability to resolve interface if they point to unique services.
-  Simply pass an interface type hint to a injected method and see what's 
+  Simply pass an interface type hint to an injected method and see what's 
   happening.
 - Enhanced testcoverage
 - Documentation
