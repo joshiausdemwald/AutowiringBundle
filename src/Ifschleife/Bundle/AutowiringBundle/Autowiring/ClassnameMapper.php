@@ -275,7 +275,7 @@ class ClassnameMapper
                 {
                     $class = new \ReflectionClass($key);
 
-                    if($class->implementsInterface($type->getName()))
+                    if($type->isInterface())
                     {
                         if($class->implementsInterface($type->getName()))
                         {
