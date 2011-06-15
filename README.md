@@ -4,6 +4,14 @@ README
 What`s NEW?
 -----------
 
+2nd half of June '11:
+
+- Added the ability to resolve interface if they point to unique services.
+  Simply pass an interface type hint to a injected method and see what's 
+  happening.
+- Enhanced testcoverage
+- Documentation
+
 June '11:
 
 - Testcoverage (yet incomplete)
@@ -132,7 +140,14 @@ will automatically gain a addMethodCall() in the DIC that´ll be constructed by
 the ContainerBuilder.
 
 Ambiguous services that share the same classname are excluded from this feature,
-so you hopefully won't suffer from magic tricks that are hard to debug.
+so you hopefully won't suffer from magic tricks that are hard to debug. If an
+ambiguous service is detected, an exception will be thrown!
+
+This even fits to interfaces, so when typehinting your method signature with
+interfaces, the injector will try to resolve it to a services that implements
+this interface. Of course this only will work correctly if there are no ambi-
+guous services that implement the same interface. Use explicit service ids in
+this case to address the service you want to be injected.
 
 In the case a service is ambiguous or you want to explicetly define the
 dependency, use the @Inject annotation:
