@@ -27,9 +27,9 @@ options are built-in:
 
 May '11:
 
-Supports inheritance by analyzing base classes. Technically, each @Service
-annotated child class is defined using a service DefinitionDecorator which holds 
-a reference to the parent service. This works recursivly until the root class
+Supports inheritance by analyzing a services' base class. Technically, each 
+@Service annotated child class is defined using a service DefinitionDecorator 
+which holds  a reference to the parent service. This works recursivly until the root class
 definition has reached.
 
 So you might want to define an abstract controller service with commonly used
@@ -52,11 +52,6 @@ This bundle does not yet claim to be a masterpiece in application design, nor
 it is (yet) configurable as promised in the small documentation below. It really
 must be understood as a case-study for determining use-cases and solutions
 to them.
-
-The bundle is an _experiment_ (that´s why it´s called "experiment") to see what
-may be achieved by DI-Autowiring, to determine which features are "good", and 
-which are "bad" in the sense of "too complex", "too magically" or simply 
-redundant.
 
 I would love to get comments on my work! *Don't hesitate beeing upfront*!
 
