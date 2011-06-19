@@ -1,6 +1,8 @@
 README
 ======
 
+Refer to the complete documentation at https://github.com/joshiausdemwald/AutowiringBundle/blob/master/src/Ifschleife/Bundle/AutowiringBundle/Resources/doc/index.rst
+
 What\`s NEW?
 ------------
 
