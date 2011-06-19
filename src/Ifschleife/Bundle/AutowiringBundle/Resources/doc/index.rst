@@ -341,7 +341,6 @@ Full fledged configuration example:
                 enabled: true
                 wire_by_type: true
 
-
     .. code-block:: xml
 
         <-- app/config/config.xml -->
@@ -356,12 +355,12 @@ Full fledged configuration example:
                     <autowiring:path 
                         filename-pattern="*Controller.php" 
                         recursive="true" 
-                        name="@IfschleifeWebsiteBundle">
+                        name="@AcmeDemoBundle">
                     </autowiring:path>
                     <autowiring:path 
                         filename-pattern="*Controller.php" 
                         recursive="true" 
-                        name="@AutowiringBundle">
+                        name="@AnotherBundle">
                     </autowiring:path>
                 </autowiring:build-definitions>
 
@@ -382,14 +381,44 @@ Full fledged configuration example:
                 />
             </autowiring:config> 
         </container>
-
-    .. code-block: php
+        
+    .. code-block:: php
     
         // app/config/config.php
+        $container->loadFromExtension('autowiring', array(
+            'enabled' => true,
+            'build_definitions' => array(
+                'paths' => array(
+                    array(
+                        'name' => '@AcmeBundle',
+                        'recursive' => true,
+                        'filename_pattern' => '*Controller.php'
+                    ),
+                    array(
+                        'name' => '@AnotherBundle',
+                        'recursive' => true,
+                        'filename_pattern' => '*Controller.php'
+                    )
+                ),
+            ),
+            'property_injection' => array(
+                'enabled' => true,
+                'wire_by_name' => 'true',
+                'name_suffix' => 'Service'
+            ),
+            'setter_injection' => array(
+                'enabled' => true,
+                'wire_by_type' => true
+            ),
+            'constructor_injection' => array(
+                'enabled' => true,
+                'wire_by_type' => true
+            )
+        ));
 
 You may ommit each of the configuration settings, all settings
 default to true. The bundle provides semantic configuration, see
-AutowiringBundle/Resources/config/schema/autowiring-1.0.xsd
+AutowiringBundle/Resources/config/schema/autowiring-1.0.xsd.
 
 Mandatory and optional references and parameters
 ------------------------------------------------
