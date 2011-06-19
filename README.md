@@ -29,8 +29,8 @@ May '11:
 
 Supports inheritance by analyzing a services' base class. Technically, each 
 @Service annotated child class is defined using a service DefinitionDecorator 
-which holds  a reference to the parent service. This works recursivly until the root class
-definition has reached.
+which holds  a reference to the parent service. This works recursivly until the 
+root class definition has reached.
 
 So you might want to define an abstract controller service with commonly used
 dependencies and inherit your controller classes from it (as you do it with
