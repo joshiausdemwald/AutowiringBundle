@@ -1,6 +1,8 @@
-# README
+README
+======
 
-## What\`s NEW?
+What\`s NEW?
+------------
 
 2nd half of June '11:
 
@@ -37,7 +39,8 @@ commonly used dependencies and inherit your controller classes from
 it (as you do it with "standard-controllers" that are not
 DIC-services.
 
-## What is Autowiring Bundle?
+What is Autowiring Bundle?
+--------------------------
 
 *Autowiring Bundle* is a *Symfony 2* bundle that enables autowiring
 for services as well as any container aware class (more precisely:
@@ -221,7 +224,8 @@ defined dependencies by analyzing the method signature.
 Instead of services you are also allowed to map DIC-Parameters or
 even plain values.
 
-## Configuration
+Configuration
+-------------
 
 Minimum configuration:
 
@@ -235,7 +239,8 @@ You may ommit each of the configuration settings, all settings
 default to true. The bundle provides semantic configuration, see
 AutowiringBundle/Resources/config/schema/autowiring-1.0.xsd.
 
-## Mandatory and optional references and parameters
+Mandatory and optional references and parameters
+------------------------------------------------
 
 By default, all autowired dependencies are NOT optional
 (mandatory).
@@ -265,7 +270,8 @@ Note that when defining method arguments as optional, your method
 signature should provide a default value by using the PHP built-in
 polymorphic feature.
 
-## Annotations for defining services
+Annotations for defining services
+---------------------------------
 
 This is an extremely useful feature in combination with the
 autowiring stuff explained above. All you have to do is to define
@@ -319,7 +325,8 @@ been defined as a DIC service.
 Open the Welcome-Page in your browser (it´s the demo´s homepage).
 That´s it.
 
-## Alternative notations for @Service
+Alternative notations for @Service
+----------------------------------
 
     @Service(Id="my.welcome.controller")
 
@@ -347,7 +354,8 @@ will be transformed into the service name
 
 , which follows the symfony DIC service naming convention.
 
-## Optional @Service parameters
+Optional @Service parameters
+----------------------------
 
 There are several additional parameters to fine-tune your service.
 Please consult the symfony 2 documentation, their use is pretty
@@ -380,7 +388,8 @@ automatically defined abstract, too!
 
 Comments are very appreciated!
 
-## Needed, not (yet?) implemented features
+Needed, not (yet?) implemented features
+---------------------------------------
 
 -   Lazy-load dependencies
 -   Lazy-load dependencies
@@ -391,11 +400,13 @@ Comments are very appreciated!
 -   Documentation (partly done)
 -   PHP-Doc
 
-## Requirements
+Requirements
+------------
 
 Symfony2 is only supported on PHP 5.3.2 and up.
 
-## Installation
+Installation
+------------
 
 The best way to install Symfony2 is to download the Symfony
 Standard Edition available at [http://symfony.com/download][1].
