@@ -73,7 +73,7 @@ class ContainerInjector extends Injector
             
             if($class->isAbstract())
             {
-                $definition->isAbstract();
+                $definition->setAbstract(true);
             }
             
             $definition->setFile($annotation->getFile());

@@ -111,6 +111,8 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         $this->assertContains('my.tag', $container->getDefinition('autowiring.full_fledged_service')->getTags());
         
         $this->assertFalse($container->getDefinition('autowiring.full_fledged_service2')->isPublic());
+        
+        $this->assertTrue($container->getDefinition('autowiring.full_fledged_service2')->isAbstract());
     }
     
     function files()

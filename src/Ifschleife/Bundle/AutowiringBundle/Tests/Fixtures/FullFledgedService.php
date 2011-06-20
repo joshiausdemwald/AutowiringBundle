@@ -42,7 +42,15 @@ class FullFledgedService
  * @author joshi
  * @Service(Id="autowiring.full_fledged_service2", Tags={"my.tag2"}, Public=false)
  */
-class FullFledgedService2
+abstract class FullFledgedService2
+{
+    
+}
+
+/**
+ * @Service(Id="autowiring.full_fledged_service3")
+ */
+class FullFledgedService3 extends FullFledgedService2
 {
     
 }
