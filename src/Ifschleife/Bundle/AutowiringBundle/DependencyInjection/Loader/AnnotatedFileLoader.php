@@ -59,7 +59,7 @@ class AnnotatedFileLoader extends FileLoader
     /**
      * @var string $path: The absolute path to the php class file (given by the locator).
      */
-    protected $classFilePath;
+    protected $locatedClasspath;
     
     /**
      * @var FileLocatorInterface
@@ -106,8 +106,13 @@ class AnnotatedFileLoader extends FileLoader
      */
     public function load($resource, $type = null)
     {
+        if(null === $this->locatedClasspath || null === $this->classes)
+        {
+            throw new \BadMethodCallException('You tried to load a resource with an uninitialized loader, or attempted to load an unsupported resource. Call supports($resource) before loading.');
+        }
+        
         // FILE RESOURCE ENABLES THE CONTAINER TO CHECK IF IT IS UP-TO-DATE
-        $this->container->addResource(new FileResource($this->classFilePath));
+        $this->container->addResource(new FileResource($this->locatedClasspath));
         
         // services
         $this->injectServices();
@@ -125,14 +130,26 @@ class AnnotatedFileLoader extends FileLoader
     {   
         if(is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION))
         {   
-            $this->classFilePath = $this->locator->locate($resource);
+            $this->locatedClasspath = $this->locator->locate($resource);
             
-            $this->classes = $this->phpParser->parseFile($this->classFilePath);
+            $this->classes = $this->detectContainedClasses($this->locatedClasspath);
 
             return count($this->classes) > 0;
         }
         
         return false;
+    }
+    
+    /**
+     * Parsed the sourcecode of the given $resource and stores any found
+     * php classes in $this->classes. 
+     * 
+     * @param type $resource
+     * @return array $foundClasses: An array of found classes.
+     */
+    protected function detectContainedClasses($resource)
+    {
+        return $this->phpParser->parseFile($resource);
     }
     
     /**

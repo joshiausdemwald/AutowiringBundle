@@ -77,6 +77,42 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         $this->assertFalse($loader->supports($file));
     }
     
+    /**
+     * Tests optional arguments like "scope", "tags", "File", "Public"
+     * @dataProvider filesWithOptionalArguments
+     */
+    function testOptionalArguments($file)
+    {
+        $container = new ContainerBuilder();
+        
+        $container->setParameter('test_path', __DIR__ . '/../../Fixtures/init.php');
+        
+        $parser = new PhpParser();
+        
+        $reader = new AnnotationReaderDecorator();
+        
+        $locator = new FileLocator();
+        
+        $containerInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, $reader);
+        
+        $loader = new AnnotatedFileLoader($container, $containerInjector, $locator, $parser);
+        
+        $this->assertTrue($loader->supports($file));
+        
+        $loader->load($file);
+        
+        $this->assertInstanceOf('Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\FullFledgedService', $service = $container->get('autowiring.full_fledged_service'));
+        
+        // SET BY PRE-REQUIRED FILE
+        $this->assertTrue(\Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\FullFledgedService::$TEST);
+        
+        $this->assertTrue($container->getDefinition('autowiring.full_fledged_service')->isPublic());
+        
+        $this->assertContains('my.tag', $container->getDefinition('autowiring.full_fledged_service')->getTags());
+        
+        $this->assertFalse($container->getDefinition('autowiring.full_fledged_service2')->isPublic());
+    }
+    
     function files()
     {
         return array(
@@ -89,6 +125,13 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         return array(
             array(__DIR__ . '/../../Fixtures/NonExistent'),
             array(__DIR__ . '/../../Fixtures/CreateServiceMalformed1.xml')
+        );
+    }
+    
+    function filesWithOptionalArguments()
+    {
+        return array(
+            array(__DIR__ . '/../../Fixtures/FullFledgedService.php')
         );
     }
 }
