@@ -8,6 +8,10 @@ What\`s NEW?
 
 2nd half of June '11:
 
+-  Added additional configuration capabilities to @Service annotation:
+
+    -  Configurator
+    -  FactoryMethod
 
 -  Added the ability to resolve interface if they point to unique
    services. Simply pass an interface type hint to an injected method
@@ -23,7 +27,6 @@ June '11:
 -  Support fine-graned configuration of services. The following
    configuraton options are built-in:
 
-   
    -  Scope
    -  Tags
    -  Public true\|false
@@ -252,52 +255,50 @@ Configuration
 
 Minimum configuration:
 
-.. configuration-block::
+.. code-block:: yaml
+
+    # app/config/config.yaml
+    autowiring: 
+        build_definitions:
+            path:
+                name: %kernel.root_dir%/../src
+                filename_pattern: "*Controller.php"
+
+.. code-block:: xml
+
+    <!-- app/config/config.xml -->
+    <container 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
+    >
+
+        <autowiring:config enabled="true">
+
+            <autowiring:build-definitions>
+
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AcmeBundle" 
+                />
+            </autowiring:build-definitions>
+        </autowiring:config>
+    </container>
     
-    .. code-block:: yaml
-        
-        # app/config/config.yaml
-        autowiring: 
-            build_definitions:
-                path:
-                    name: %kernel.root_dir%/../src
-                    filename_pattern: "*Controller.php"
+.. code-block:: php
 
-    .. code-block:: xml
-        
-        <!-- app/config/config.xml -->
-        <container 
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns="http://symfony.com/schema/dic/services"
-            xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
-        >
-
-            <autowiring:config enabled="true">
-
-                <autowiring:build-definitions>
-                    
-                    <autowiring:path 
-                        filename-pattern="*Controller.php" 
-                        recursive="true" 
-                        name="@AcmeBundle" 
-                    />
-                </autowiring:build-definitions>
-            </autowiring:config>
-        </container>
-    
-    .. code-block:: php
-
-        // app/config/config.php
-        $container->loadFromExtension('autowiring', array(
-            'enabled' => true,
-            'build_definitions' => array(
-                'path' => array(
-                    'name' => '@AcmeBundle',
-                    'recursive' => true,
-                    'filename_pattern' => '*Controller.php'
-                ),
+    // app/config/config.php
+    $container->loadFromExtension('autowiring', array(
+        'enabled' => true,
+        'build_definitions' => array(
+            'path' => array(
+                'name' => '@AcmeBundle',
+                'recursive' => true,
+                'filename_pattern' => '*Controller.php'
             ),
-        ));
+        ),
+    ));
 
 This configuration will use proper default values and will register
 all matching \*Controller.php files that reside in the /src folder
@@ -305,118 +306,116 @@ as services.
 
 Full fledged configuration example:
 
-.. configuration-block::
-
-    .. code-block:: yaml
+.. code-block:: yaml
     
-        # app/config/config.yml:
-        autowiring: 
-            enabled: true # set to false to disable all functionality
-            build_definitions:
-                enabled: true # set false to entirely disable definition building
-                paths:
-                    "%kernel.root_dir%/../src": # Register all controllers
-                        filename_pattern: "*Controller.php"
-                        recursive: true
+    # app/config/config.yml:
+    autowiring: 
+        enabled: true # set to false to disable all functionality
+        build_definitions:
+            enabled: true # set false to entirely disable definition building
+            paths:
+                "%kernel.root_dir%/../src": # Register all controllers
+                    filename_pattern: "*Controller.php"
+                    recursive: true
 
-                    "@AcmeDemoBundle": # Register only controllers in acme bundle
-                        filename_pattern: "*Controller.php"
-                        recursive: true
+                "@AcmeDemoBundle": # Register only controllers in acme bundle
+                    filename_pattern: "*Controller.php"
+                    recursive: true
 
-                    "@AcmeDemoBundle/Controller/MyController.php": ~ # Register a single file
+                "@AcmeDemoBundle/Controller/MyController.php": ~ # Register a single file
 
-            build_definitions:          # Do build services
+        build_definitions:          # Do build services
+            enabled: true
+            files:
+                controllers:
+                    pathnames: *
+                    pattern: *Controller.php
+        property_injection:         # Do property injection
+            enabled: true
+            wire_by_name:
                 enabled: true
-                files:
-                    controllers:
-                        pathnames: *
-                        pattern: *Controller.php
-            property_injection:         # Do property injection
-                enabled: true
-                wire_by_name:
-                    enabled: true
-                    name_suffix: Service
-            constructor_injection:      # Do constructor injection
-                enabled: true
-                wire_by_type: true
-            setter_injection:           # Do setter injection
-                enabled: true
-                wire_by_type: true
+                name_suffix: Service
+        constructor_injection:      # Do constructor injection
+            enabled: true
+            wire_by_type: true
+        setter_injection:           # Do setter injection
+            enabled: true
+            wire_by_type: true
 
-    .. code-block:: xml
+.. code-block:: xml
 
-        <-- app/config/config.xml -->
-        <container 
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns="http://symfony.com/schema/dic/services"
-            xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
-        >
+    <-- app/config/config.xml -->
+    <container 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
+    >
 
-            <autowiring:config enabled="true">
-                <autowiring:build-definitions>
-                    <autowiring:path 
-                        filename-pattern="*Controller.php" 
-                        recursive="true" 
-                        name="@AcmeDemoBundle">
-                    </autowiring:path>
-                    <autowiring:path 
-                        filename-pattern="*Controller.php" 
-                        recursive="true" 
-                        name="@AnotherBundle">
-                    </autowiring:path>
-                </autowiring:build-definitions>
+        <autowiring:config enabled="true">
+            <autowiring:build-definitions>
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AcmeDemoBundle">
+                </autowiring:path>
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AnotherBundle">
+                </autowiring:path>
+            </autowiring:build-definitions>
 
-                <autowiring:property-injection 
-                    enabled="true"
-                    wire-by-name="true" 
-                    name-suffix="Service" 
-                />
+            <autowiring:property-injection 
+                enabled="true"
+                wire-by-name="true" 
+                name-suffix="Service" 
+            />
 
-                <autowiring:setter-injection 
-                    enabled="true" 
-                    wire-by-type="true" 
-                />
+            <autowiring:setter-injection 
+                enabled="true" 
+                wire-by-type="true" 
+            />
 
-                <autowiring:constructor-injection 
-                    enabled="true"
-                    wire-by-type="true" 
-                />
-            </autowiring:config> 
-        </container>
+            <autowiring:constructor-injection 
+                enabled="true"
+                wire-by-type="true" 
+            />
+        </autowiring:config> 
+    </container>
         
-    .. code-block:: php
+.. code-block:: php
     
-        // app/config/config.php
-        $container->loadFromExtension('autowiring', array(
-            'enabled' => true,
-            'build_definitions' => array(
-                'paths' => array(
-                    array(
-                        'name' => '@AcmeBundle',
-                        'recursive' => true,
-                        'filename_pattern' => '*Controller.php'
-                    ),
-                    array(
-                        'name' => '@AnotherBundle',
-                        'recursive' => true,
-                        'filename_pattern' => '*Controller.php'
-                    )
+    // app/config/config.php
+    $container->loadFromExtension('autowiring', array(
+        'enabled' => true,
+        'build_definitions' => array(
+            'paths' => array(
+                array(
+                    'name' => '@AcmeBundle',
+                    'recursive' => true,
+                    'filename_pattern' => '*Controller.php'
                 ),
+                array(
+                    'name' => '@AnotherBundle',
+                    'recursive' => true,
+                    'filename_pattern' => '*Controller.php'
+                )
             ),
-            'property_injection' => array(
-                'enabled' => true,
-                'wire_by_name' => 'true',
-                'name_suffix' => 'Service'
-            ),
-            'setter_injection' => array(
-                'enabled' => true,
-                'wire_by_type' => true
-            ),
-            'constructor_injection' => array(
-                'enabled' => true,
-                'wire_by_type' => true
-            )
-        ));
+        ),
+        'property_injection' => array(
+            'enabled' => true,
+            'wire_by_name' => 'true',
+            'name_suffix' => 'Service'
+        ),
+        'setter_injection' => array(
+            'enabled' => true,
+            'wire_by_type' => true
+        ),
+        'constructor_injection' => array(
+            'enabled' => true,
+            'wire_by_type' => true
+        )
+    ));
 
 You may ommit each of the configuration settings, all settings
 default to true. The bundle provides semantic configuration, see
@@ -586,6 +585,87 @@ Example:
 
 Note that by using the "abstract" keyword, the service is
 automatically defined abstract, too!
+
+You might choose to define a factory method for a service. Do so by
+setting the FactoryMethod parameter:
+
+::
+
+    /**
+     * @Service(Id="my.manufactured_service", FactoryMethod="getInstance")
+     */
+    class ManufacturedService
+    {
+        public abstract function getInstance()
+        {
+            return new self();
+        }
+    }
+
+A factory method may be a php callable defined as an array (closures are not 
+supported):
+
+::
+
+    /**
+     * @Service(Id="my.manufactured_service", FactoryMethod={"myFactoryClass", "getMyService"})
+     */
+    class ManufacturedService
+    {
+    }
+
+    class myFactoryClass
+    {
+        public static function getMyService()
+        {
+            return new myService();
+        }
+    }
+
+Service might be defined as factory classes, too:
+
+::
+
+    /**
+     * @Service(Id="my.service", FactoryMethod={"@a.factory.service", "getMyService"})
+     */
+    class myService
+    {
+    }
+
+    /**
+     * @Service(Id="a.factory.service")
+     */
+    class myFactoryService
+    {
+        public static function getMyService()
+        {
+            return new myService();
+        }
+    }
+
+You can also define a Configurator callable that will be called right after 
+instanciation of the service. A Configurator might be any php callable, even
+a \Closure!
+
+::
+
+    /**
+     * @Service(Id="my.service", Configurator={"\aClass", "aMethod"})
+     */
+    class myService
+    {
+    }
+
+
+::
+
+    /**
+     * @Service(Id="my.service", Configurator="function() { ... }")
+     */
+    class myService
+    {
+    }
 
 Comments are very appreciated!
 
