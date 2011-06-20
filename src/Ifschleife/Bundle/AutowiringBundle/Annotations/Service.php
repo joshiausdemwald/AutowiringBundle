@@ -55,6 +55,12 @@ class Service extends Annotation
     public $Tags;
     
     /**
+     * @var array || string $factoryMethod: A php callable or a simple string 
+     *                                      that refers to the $this-Object.
+     */
+    public $FactoryMethod;
+    
+    /**
      * The scope of the definition
      * 
      * @link https://github.com/kriswallsmith/symfony-scoped-container
@@ -127,5 +133,17 @@ class Service extends Annotation
         }
         
         return ContainerInterface::SCOPE_PROTOTYPE;
+    }
+    
+    /**
+     * Returns a factory method as a valid php callable
+     * or a string that refers to a factory method on the
+     * $this-object.
+     * 
+     * @return array || string $factoryMethod
+     */
+    public function getFactoryMethod()
+    {
+        return $this->FactoryMethod;
     }
 }

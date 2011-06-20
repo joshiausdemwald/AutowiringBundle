@@ -54,3 +54,35 @@ class FullFledgedService3 extends FullFledgedService2
 {
     
 }
+
+/**
+ * @Service(Id="autowiring.full_fledged_service4", FactoryMethod="getInstance")
+ */
+class FullFledgedService4 
+{
+    public static function getInstance()
+    {
+        return new self();
+    }
+    
+    public static function getInstance2()
+    {
+        return new FullFledgedService5();
+    }
+}
+
+/**
+ * @Service(Id="autowiring.full_fledged_service5", FactoryMethod={"@autowiring.full_fledged_service4", "getInstance"})
+ */
+class FullFledgedService5
+{
+    
+}
+
+/**
+ * @Service(Id="autowiring.full_fledged_service6", FactoryMethod={"Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\FullFledgedService4", "getInstance"})
+ */
+class FullFledgedService6
+{
+    
+}

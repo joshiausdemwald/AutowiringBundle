@@ -113,6 +113,23 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         $this->assertFalse($container->getDefinition('autowiring.full_fledged_service2')->isPublic());
         
         $this->assertTrue($container->getDefinition('autowiring.full_fledged_service2')->isAbstract());
+        
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $container->getDefinition('autowiring.full_fledged_service3'));
+        
+        $this->assertEquals('autowiring.full_fledged_service2', $container->getDefinition('autowiring.full_fledged_service3')->getParent());
+        
+        // FACTORY METHOD TEST #1
+        $this->assertEquals('Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\FullFledgedService4', $container->getDefinition('autowiring.full_fledged_service4')->getFactoryClass());
+        $this->assertEquals('getInstance', $container->getDefinition('autowiring.full_fledged_service4')->getFactoryMethod());
+        
+        // FACTORY METHOD TEST #2
+        $this->assertEquals('autowiring.full_fledged_service4', $container->getDefinition('autowiring.full_fledged_service5')->getFactoryService());
+        $this->assertEquals('getInstance', $container->getDefinition('autowiring.full_fledged_service5')->getFactoryMethod());
+        
+        // FACTORY METHOD TEST #4
+        $this->assertEquals('Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\FullFledgedService4', $container->getDefinition('autowiring.full_fledged_service6')->getFactoryClass());
+        $this->assertEquals('getInstance', $container->getDefinition('autowiring.full_fledged_service6')->getFactoryMethod());
+        
     }
     
     function files()

@@ -76,6 +76,40 @@ class ContainerInjector extends Injector
                 $definition->setAbstract(true);
             }
             
+            if(null !== ($callable = $annotation->getFactoryMethod()))
+            {
+                if(is_string($callable))
+                {
+                    $definition->setFactoryClass($definition->getClass());
+                    $definition->setFactoryMethod($callable);
+                }
+                elseif(is_array($callable))
+                {
+                    $callable = array_values($callable);
+                    
+                    if(count($callable) != 2)
+                    {
+                        throw new BadCallableException(sprintf('A factory callable must either be a string (a method name which refers to "self") or any valid php callable defined as an array in class "%s".', $class->getName()));
+                    }
+                    // SERVICE OR CLASS?
+                    if(0 === strpos($callable[0], '@'))
+                    {
+                        $service_name = substr($callable[0], 1);
+                        
+                        $definition->setFactoryService($service_name);
+                    }
+                    else
+                    {
+                        $definition->setFactoryClass($callable[0]);
+                    }
+                    $definition->setFactoryMethod($callable[1]);
+                }
+                else
+                {
+                    throw new BadCallableException(sprintf('A factory callable must either be a string (a method name which refers to "self") or any valid php callable defined as an array in service class "%s".', $class->getName()));
+                }
+            }
+            
             $definition->setFile($annotation->getFile());
             
             $definition->setPublic($annotation->getPublic());
