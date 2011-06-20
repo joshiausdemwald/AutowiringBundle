@@ -61,6 +61,11 @@ class Service extends Annotation
     public $FactoryMethod;
     
     /**
+     * @var mixed $Configurator
+     */
+    public $Configurator;
+    
+    /**
      * The scope of the definition
      * 
      * @link https://github.com/kriswallsmith/symfony-scoped-container
@@ -127,12 +132,7 @@ class Service extends Annotation
     
     public function getScope()
     {
-        if(null === $this->Scope || 'container' === $this->Scope)
-        {
-            return ContainerInterface::SCOPE_CONTAINER;
-        }
-        
-        return ContainerInterface::SCOPE_PROTOTYPE;
+        return $this->Scope;
     }
     
     /**
@@ -145,5 +145,16 @@ class Service extends Annotation
     public function getFactoryMethod()
     {
         return $this->FactoryMethod;
+    }
+    
+    /**
+     * Returns the service configurator which must be - if set - a valid
+     * a valid php callable
+     * 
+     * @return mixed $Configurator
+     */
+    public function getConfigurator()
+    {
+        return $this->Configurator;
     }
 }

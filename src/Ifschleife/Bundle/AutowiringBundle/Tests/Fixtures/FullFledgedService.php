@@ -40,7 +40,7 @@ class FullFledgedService
  * FullFledgedService2
  *
  * @author joshi
- * @Service(Id="autowiring.full_fledged_service2", Tags={"my.tag2"}, Public=false)
+ * @Service(Id="autowiring.full_fledged_service2", Tags={"my.tag2"}, Public=false, Scope="prototype")
  */
 abstract class FullFledgedService2
 {
@@ -85,4 +85,23 @@ class FullFledgedService5
 class FullFledgedService6
 {
     
+}
+
+/**
+ * @Service(Id="autowiring.full_fledged_service7", Configurator="function(){}")
+ */
+class FullFledgedService7
+{
+    
+}
+
+/**
+ * @Service(Id="autowiring.full_fledged_service8", Configurator={"Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\FullFledgedService8", "configure"})
+ */
+class FullFledgedService8
+{
+    public static function configure()
+    {
+        
+    }
 }

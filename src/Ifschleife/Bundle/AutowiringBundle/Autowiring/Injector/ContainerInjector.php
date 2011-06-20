@@ -26,6 +26,7 @@ namespace Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Inflector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * ContainerInjector loads services into the DIC
@@ -76,6 +77,7 @@ class ContainerInjector extends Injector
                 $definition->setAbstract(true);
             }
             
+            // @todo: refactor to unify @/% detection
             if(null !== ($callable = $annotation->getFactoryMethod()))
             {
                 if(is_string($callable))
@@ -110,11 +112,33 @@ class ContainerInjector extends Injector
                 }
             }
             
+            if(null !== $callable = $annotation->getConfigurator())
+            {
+                if(is_string($callable) && 0 === strpos($callable, "function"))
+                {
+                    $callable = eval('return ' . $callable . ';');
+                }
+                
+                if( ! is_callable($callable))
+                {
+                    throw new BadCallableException(sprintf('The given Configurator is not a valid php callable in class "%s".', $class->getName()));
+                }
+                
+                $definition->setConfigurator($callable);
+            }
+            
             $definition->setFile($annotation->getFile());
             
             $definition->setPublic($annotation->getPublic());
             
-            $definition->setScope($annotation->getScope());
+            $scope = Container::SCOPE_CONTAINER;
+            
+            if(null !== $annotation->getScope())
+            {
+                $scope = $annotation->getScope();
+            }
+            
+            $definition->setScope($scope);
             
             $definition->setTags($annotation->getTags());
             
