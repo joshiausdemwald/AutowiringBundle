@@ -1,19 +1,24 @@
-README
-======
+# README
 
 Refer to the complete documentation at
 [https://github.com/joshiausdemwald/AutowiringBundle/blob/master/src/Ifschleife/Bundle/AutowiringBundle/Resources/doc/index.rst](https://github.com/joshiausdemwald/AutowiringBundle/blob/master/src/Ifschleife/Bundle/AutowiringBundle/Resources/doc/index.rst)
 
-What\`s NEW?
-------------
+## What\`s NEW?
 
 2nd half of June '11:
+
+-   Added additional configuration capabilities to @Service
+    annotation:
+
+    > -   Configurator
+    > -   FactoryMethod
 
 -   Added the ability to resolve interface if they point to unique
     services. Simply pass an interface type hint to an injected method
     and see what's happening.
 -   Enhanced testcoverage
 -   Documentation
+
 
 June '11:
 
@@ -42,8 +47,7 @@ commonly used dependencies and inherit your controller classes from
 it (as you do it with "standard-controllers" that are not
 DIC-services.
 
-What is Autowiring Bundle?
---------------------------
+## What is Autowiring Bundle?
 
 *Autowiring Bundle* is a *Symfony 2* bundle that enables autowiring
 for services as well as any container aware class (more precisely:
@@ -227,10 +231,48 @@ defined dependencies by analyzing the method signature.
 Instead of services you are also allowed to map DIC-Parameters or
 even plain values.
 
-Configuration
--------------
+## Configuration
 
 Minimum configuration:
+
+    # app/config/config.yaml
+    autowiring: 
+        build_definitions:
+            path:
+                name: %kernel.root_dir%/../src
+                filename_pattern: "*Controller.php"
+
+    <!-- app/config/config.xml -->
+    <container 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
+    >
+    
+        <autowiring:config enabled="true">
+    
+            <autowiring:build-definitions>
+    
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AcmeBundle" 
+                />
+            </autowiring:build-definitions>
+        </autowiring:config>
+    </container>
+
+    // app/config/config.php
+    $container->loadFromExtension('autowiring', array(
+        'enabled' => true,
+        'build_definitions' => array(
+            'path' => array(
+                'name' => '@AcmeBundle',
+                'recursive' => true,
+                'filename_pattern' => '*Controller.php'
+            ),
+        ),
+    ));
 
 This configuration will use proper default values and will register
 all matching \*Controller.php files that reside in the /src folder
@@ -238,12 +280,116 @@ as services.
 
 Full fledged configuration example:
 
+    # app/config/config.yml:
+    autowiring: 
+        enabled: true # set to false to disable all functionality
+        build_definitions:
+            enabled: true # set false to entirely disable definition building
+            paths:
+                "%kernel.root_dir%/../src": # Register all controllers
+                    filename_pattern: "*Controller.php"
+                    recursive: true
+    
+                "@AcmeDemoBundle": # Register only controllers in acme bundle
+                    filename_pattern: "*Controller.php"
+                    recursive: true
+    
+                "@AcmeDemoBundle/Controller/MyController.php": ~ # Register a single file
+    
+        build_definitions:          # Do build services
+            enabled: true
+            files:
+                controllers:
+                    pathnames: *
+                    pattern: *Controller.php
+        property_injection:         # Do property injection
+            enabled: true
+            wire_by_name:
+                enabled: true
+                name_suffix: Service
+        constructor_injection:      # Do constructor injection
+            enabled: true
+            wire_by_type: true
+        setter_injection:           # Do setter injection
+            enabled: true
+            wire_by_type: true
+
+    <-- app/config/config.xml -->
+    <container 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:autowiring="http://ifschleife.de/schema/dic/autowiring"
+    >
+    
+        <autowiring:config enabled="true">
+            <autowiring:build-definitions>
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AcmeDemoBundle">
+                </autowiring:path>
+                <autowiring:path 
+                    filename-pattern="*Controller.php" 
+                    recursive="true" 
+                    name="@AnotherBundle">
+                </autowiring:path>
+            </autowiring:build-definitions>
+    
+            <autowiring:property-injection 
+                enabled="true"
+                wire-by-name="true" 
+                name-suffix="Service" 
+            />
+    
+            <autowiring:setter-injection 
+                enabled="true" 
+                wire-by-type="true" 
+            />
+    
+            <autowiring:constructor-injection 
+                enabled="true"
+                wire-by-type="true" 
+            />
+        </autowiring:config> 
+    </container>
+
+    // app/config/config.php
+    $container->loadFromExtension('autowiring', array(
+        'enabled' => true,
+        'build_definitions' => array(
+            'paths' => array(
+                array(
+                    'name' => '@AcmeBundle',
+                    'recursive' => true,
+                    'filename_pattern' => '*Controller.php'
+                ),
+                array(
+                    'name' => '@AnotherBundle',
+                    'recursive' => true,
+                    'filename_pattern' => '*Controller.php'
+                )
+            ),
+        ),
+        'property_injection' => array(
+            'enabled' => true,
+            'wire_by_name' => 'true',
+            'name_suffix' => 'Service'
+        ),
+        'setter_injection' => array(
+            'enabled' => true,
+            'wire_by_type' => true
+        ),
+        'constructor_injection' => array(
+            'enabled' => true,
+            'wire_by_type' => true
+        )
+    ));
+
 You may ommit each of the configuration settings, all settings
 default to true. The bundle provides semantic configuration, see
 AutowiringBundle/Resources/config/schema/autowiring-1.0.xsd.
 
-Mandatory and optional references and parameters
-------------------------------------------------
+## Mandatory and optional references and parameters
 
 By default, all autowired dependencies are NOT optional
 (mandatory).
@@ -273,8 +419,7 @@ Note that when defining method arguments as optional, your method
 signature should provide a default value by using the PHP built-in
 polymorphic feature.
 
-Annotations for defining services
----------------------------------
+## Annotations for defining services
 
 This is an extremely useful feature in combination with the
 autowiring stuff explained above. All you have to do is to define
@@ -328,8 +473,7 @@ been defined as a DIC service.
 Open the Welcome-Page in your browser (it´s the demo´s homepage).
 That´s it.
 
-Alternative notations for @Service
-----------------------------------
+## Alternative notations for @Service
 
     @Service(Id="my.welcome.controller")
 
@@ -357,8 +501,7 @@ will be transformed into the service name
 
 , which follows the symfony DIC service naming convention.
 
-Optional @Service parameters
-----------------------------
+## Optional @Service parameters
 
 There are several additional parameters to fine-tune your service.
 Please consult the symfony 2 documentation, their use is pretty
@@ -389,10 +532,79 @@ Example:
 Note that by using the "abstract" keyword, the service is
 automatically defined abstract, too!
 
+You might choose to define a factory method for a service. Do so by
+setting the FactoryMethod parameter:
+
+    /**
+     * @Service(Id="my.manufactured_service", FactoryMethod="getInstance")
+     */
+    class ManufacturedService
+    {
+        public abstract function getInstance()
+        {
+            return new self();
+        }
+    }
+
+A factory method may be a php callable defined as an array
+(closures are not supported):
+
+    /**
+     * @Service(Id="my.manufactured_service", FactoryMethod={"myFactoryClass", "getMyService"})
+     */
+    class ManufacturedService
+    {
+    }
+    
+    class myFactoryClass
+    {
+        public static function getMyService()
+        {
+            return new myService();
+        }
+    }
+
+Service might be defined as factory classes, too:
+
+    /**
+     * @Service(Id="my.service", FactoryMethod={"@a.factory.service", "getMyService"})
+     */
+    class myService
+    {
+    }
+    
+    /**
+     * @Service(Id="a.factory.service")
+     */
+    class myFactoryService
+    {
+        public static function getMyService()
+        {
+            return new myService();
+        }
+    }
+
+You can also define a Configurator callable that will be called
+right after instanciation of the service. A Configurator might be
+any php callable, even a Closure!
+
+    /**
+     * @Service(Id="my.service", Configurator={"\aClass", "aMethod"})
+     */
+    class myService
+    {
+    }
+
+    /**
+     * @Service(Id="my.service", Configurator="function() { ... }")
+     */
+    class myService
+    {
+    }
+
 Comments are very appreciated!
 
-Needed, not (yet?) implemented features
----------------------------------------
+## Needed, not (yet?) implemented features
 
 -   Lazy-load dependencies
 -   Lazy-load dependencies
@@ -403,13 +615,11 @@ Needed, not (yet?) implemented features
 -   Documentation (partly done)
 -   PHP-Doc
 
-Requirements
-------------
+## Requirements
 
 Symfony2 is only supported on PHP 5.3.2 and up.
 
-Installation
-------------
+## Installation
 
 The best way to install Symfony2 is to download the Symfony
 Standard Edition available at [http://symfony.com/download][1].
