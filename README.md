@@ -588,12 +588,25 @@ You can also define a Configurator callable that will be called
 right after instanciation of the service. A Configurator might be
 any php callable, even a Closure!
 
+Example for a callable defined as a flat function call:
+
+    /**
+     * @Service(Id="my.service", Configurator="aFunction")
+     */
+    class myService
+    {
+    }
+
+Example for a callable defined as a php callable array:
+
     /**
      * @Service(Id="my.service", Configurator={"\aClass", "aMethod"})
      */
     class myService
     {
     }
+
+Example for a callable defined as a closure:
 
     /**
      * @Service(Id="my.service", Configurator="function() { ... }")
