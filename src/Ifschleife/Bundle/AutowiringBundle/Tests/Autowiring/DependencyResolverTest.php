@@ -233,6 +233,119 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         );
     }
     
+    /**
+     * 
+     */
+    public function failOptionalArguments()
+    {
+        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        
+        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        
+        $serviceBuilder = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder(
+            new \Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader(
+                $container, 
+                new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, 
+                        $reader
+                ),
+                new \Symfony\Component\Config\FileLocator(),
+                new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser()
+        ));
+        
+        $serviceBuilder->setFiles(array(__DIR__ . '/../Fixtures/OptionalInjectionFailclass.php'));
+        
+        $serviceBuilder->build();
+        
+        $classnameMapper = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper($container);
+        
+        $propertyInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector($container, $reader);
+        $propertyInjector->setWireByName(true);
+        $propertyInjector->setServiceNameSuffix('Service');
+     
+        $constructorInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ConstructorInjector($container, $reader, $classnameMapper);
+        $constructorInjector->setWireByType(true);
+        
+        $setterInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\SetterInjector($container, $reader, $classnameMapper);
+        $setterInjector->setWireByType(true);
+        
+        // ContainerBuilder $container, ClassnameMapper $classname_mapper, PropertyInjector $property_injector, ConstructorInjector $constructor_injector, SetterInjector $setter_injector
+        $dependencyResolver = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver(
+            $container,
+            $classnameMapper,
+            $propertyInjector, 
+            $constructorInjector,
+            $setterInjector
+        );
+        
+        try 
+        {
+            $dependencyResolver->resolve();   
+        }
+        catch(Exception $e)
+        {
+            $this->assertInstanceOf('Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\UnresolvedReferenceException', $e);
+        }
+        
+    }
+    
+    /**
+     * @dataProvider optionalFiles
+     */
+    public function testOptionalArguments($file)
+    {
+        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        
+        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        
+        $serviceBuilder = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder(
+            new \Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader(
+                $container, 
+                new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ContainerInjector($container, 
+                        $reader
+                ),
+                new \Symfony\Component\Config\FileLocator(),
+                new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser()
+        ));
+        
+        $serviceBuilder->setFiles(array($file));
+        
+        $serviceBuilder->build();
+        
+        $classnameMapper = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ClassnameMapper($container);
+        
+        $propertyInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector($container, $reader);
+        $propertyInjector->setWireByName(true);
+        $propertyInjector->setServiceNameSuffix('Service');
+     
+        $constructorInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\ConstructorInjector($container, $reader, $classnameMapper);
+        $constructorInjector->setWireByType(true);
+        
+        $setterInjector = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\SetterInjector($container, $reader, $classnameMapper);
+        $setterInjector->setWireByType(true);
+        
+        // ContainerBuilder $container, ClassnameMapper $classname_mapper, PropertyInjector $property_injector, ConstructorInjector $constructor_injector, SetterInjector $setter_injector
+        $dependencyResolver = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\DependencyResolver(
+            $container,
+            $classnameMapper,
+            $propertyInjector, 
+            $constructorInjector,
+            $setterInjector
+        );
+        
+        $dependencyResolver->resolve();
+        
+        $this->assertInstanceOf('Ifschleife\Bundle\AutowiringBundle\Tests\Fixtures\OptionalInjectionTestclass', $container->get('autowiring.optional_injection_testclass'));
+    }
+    
+    function optionalFiles()
+    {
+        return array(
+            array(
+                __DIR__ . '/../Fixtures/OptionalInjectionTestclass.php'
+            )
+        );
+    }
+    
     function files()
     {
         return array(

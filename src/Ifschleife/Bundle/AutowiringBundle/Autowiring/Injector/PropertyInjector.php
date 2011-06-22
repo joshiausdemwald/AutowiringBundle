@@ -139,20 +139,26 @@ class PropertyInjector extends Injector
                 }
                 catch(\InvalidArgumentException $e)
                 {
-                    throw new UnresolvedReferenceException(sprintf('Instance property "%s::$%s" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $property->getDeclaringClass()->getName(), $property->getName(), $resource_name), null, $e);
+                    if( ! $is_optional)
+                    {
+                        throw new UnresolvedReferenceException(sprintf('Instance property "%s::$%s" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $property->getDeclaringClass()->getName(), $property->getName(), $resource_name), null, $e);
+                    }
                 }
                 
                 $inject = $this->createReference($resource_name, $is_optional, true);
             }
             elseif($annotationMap->getIsParameter(0))
             {
-                if($this->container->hasParameter($resource_name) && ! $is_optional)
+                if($this->container->hasParameter($resource_name))
                 {
                     $inject = new Parameter($resource_name);
                 }
                 else
                 {
-                    throw new UnresolvedParamterException(sprintf('Instance property "%s::$%s" could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $property->getDeclaringClass()->getName(), $property->getName(), $resource_name));
+                    if( ! $is_optional)
+                    {
+                        throw new UnresolvedParamterException(sprintf('Instance property "%s::$%s" could not be resolved: Container parameter "%s" not found. Please provide a valid parameter name.', $property->getDeclaringClass()->getName(), $property->getName(), $resource_name));
+                    }
                 }
             }
             

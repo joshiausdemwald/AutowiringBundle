@@ -52,6 +52,12 @@ class ContainerInjector extends Injector
         return $this->doInject($class);
     }
     
+    /**
+     * Does the injection.
+     * 
+     * @param \ReflectionClass $class
+     * @return String $service_Id: The services id´s.
+     */
     protected function doInject(\ReflectionClass $class)
     {
         if($this->hasAnnotation(Injector::ANNOTATION_SERVICE))
@@ -158,6 +164,8 @@ class ContainerInjector extends Injector
      */
     protected function createDefinition(\ReflectionClass $class)
     {
+        $definition = null; 
+        
         if(false !== ($parentClass = $class->getParentClass()))
         {
             $parent_service_id = $this->injectService($parentClass);

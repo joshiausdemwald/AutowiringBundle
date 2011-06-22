@@ -92,7 +92,7 @@ abstract class MethodInjector extends Injector
             if($annotationsMap->hasHint($i))
             {
                 $is_optional = $annotationsMap->getIsOptional($i);
-
+                
                 $resource_name = $annotationsMap->getResourceName($i);
                 
                 // NO MATCHING SERVICE PARAMETER FOUND, CHECK FOR SCALAR VALUE
@@ -104,7 +104,10 @@ abstract class MethodInjector extends Injector
                     }
                     catch(\InvalidArgumentException $e)
                     {
-                        throw new UnresolvedReferenceException(sprintf('Argument "$%s" on method "%s::%s()" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name), null, $e);
+                        if( ! $is_optional)
+                        {
+                            throw new UnresolvedReferenceException(sprintf('Argument "$%s" on method "%s::%s()" could not be resolved: Service definition "%s" not found. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $resource_name), null, $e);
+                        }
                     }
                     
                     $arguments[] = $this->createReference($resource_name, $this->getBehaviour($parameter, $is_optional), true);
@@ -153,15 +156,15 @@ abstract class MethodInjector extends Injector
                 else
                 {   
                     $service_id = $this->classnameMapper->resolveService($type->getName());
-
-                    if (null === $service_id)
-                    {
-                        throw new UnresolvedReferenceException(sprintf('Argument "$%s" at method signature of "%s::%s()" could not be resolved: There is no service that matches the arguments typename. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $type->getName()));
-                    }
-
+                    
                     if (false === $service_id)
                     {
                         throw new AmbiguousServiceReferenceException(sprintf('Argument "$%s" of type "%s" at method signature of "%s::%s()" could not be distinctly allocated: There is more than on services that rely on the given type. Please provide a valid, distinct service id.', $parameter->getName(), $type->getName(),  $method->getDeclaringClass()->getName(), $method->getName()));
+                    }
+                    
+                    if (null === $service_id && ! $parameter->isOptional())
+                    {
+                        throw new UnresolvedReferenceException(sprintf('Argument "$%s" at method signature of "%s::%s()" could not be resolved: There is no service that matches the arguments typename. Please provide a valid service id.', $parameter->getName(), $method->getDeclaringClass()->getName(), $method->getName(), $type->getName()));
                     }
                     
                     $arguments[] = $this->createReference($service_id, $this->getBehaviour($parameter), true);
@@ -185,7 +188,7 @@ abstract class MethodInjector extends Injector
     {
         if(null === $is_optional || $is_optional)
         {
-            if($parameter->isOptional() || $parameter->isDefaultValueAvailable())
+            if($parameter->isOptional())
             {
                 return Container::IGNORE_ON_INVALID_REFERENCE;
             }
