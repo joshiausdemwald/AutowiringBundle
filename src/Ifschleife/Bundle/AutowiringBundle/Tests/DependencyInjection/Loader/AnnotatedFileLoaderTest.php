@@ -26,9 +26,10 @@ namespace Ifschleife\Bundle\AutowiringBundle\Tests\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader;
 use Ifschleife\Bundle\AutowiringBundle\Autowiring\Parser\PhpParser;
+use Doctrine\Common\Annotations\DocParser;
 
 /**
  * AnnotatedFileLoaderTest
@@ -46,7 +47,11 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $parser = new PhpParser();
         
-        $reader = new AnnotationReaderDecorator();
+        $docParser = new DocParser();
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new AnnotationReader($docParser);
         
         $locator = new FileLocator();
         
@@ -66,7 +71,11 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $parser = new PhpParser();
         
-        $reader = new AnnotationReaderDecorator();
+        $docParser = new DocParser();
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new AnnotationReader($docParser);
         
         $locator = new FileLocator();
         
@@ -89,7 +98,11 @@ class AnnotatedFileLoaderTest extends \PHPUnit_Framework_Testcase
         
         $parser = new PhpParser();
         
-        $reader = new AnnotationReaderDecorator();
+        $docParser = new DocParser();
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        $docParser->setAutoloadAnnotations(true);
+        
+        $reader = new AnnotationReader($docParser);
         
         $locator = new FileLocator();
         

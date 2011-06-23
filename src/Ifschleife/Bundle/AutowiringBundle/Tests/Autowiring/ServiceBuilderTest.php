@@ -38,7 +38,11 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder;
         
-        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        $docParser = new \Doctrine\Common\Annotations\DocParser();
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader($docParser);
         
         $loader  = new AnnotatedFileLoader(
             $container,
@@ -74,7 +78,11 @@ class ServiceBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder;
         
-        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        $docParser = new \Doctrine\Common\Annotations\DocParser();
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader($docParser);
         
         $loader  = new AnnotatedFileLoader(
             $container,

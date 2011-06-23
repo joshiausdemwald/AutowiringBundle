@@ -39,7 +39,11 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
         
         $container->setParameter('superparameter', 'superparametervalue');
         
-        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        $docParser = new \Doctrine\Common\Annotations\DocParser();
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader($docParser);
         
         $serviceBuilder = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder(
             new \Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader(
@@ -240,7 +244,11 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
         
-        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        $docParser = new \Doctrine\Common\Annotations\DocParser;
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader($docParser);
         
         $serviceBuilder = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder(
             new \Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader(
@@ -295,7 +303,11 @@ class DependencyResolverTest extends \PHPUnit_Framework_TestCase
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
         
-        $reader = new \Ifschleife\Bundle\AutowiringBundle\Annotation\AnnotationReaderDecorator;
+        $docParser = new \Doctrine\Common\Annotations\DocParser();
+        $docParser->setAutoloadAnnotations(true);
+        $docParser->setIgnoreNotImportedAnnotations(true);
+        
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader($docParser);
         
         $serviceBuilder = new \Ifschleife\Bundle\AutowiringBundle\Autowiring\ServiceBuilder(
             new \Ifschleife\Bundle\AutowiringBundle\DependencyInjection\Loader\AnnotatedFileLoader(
