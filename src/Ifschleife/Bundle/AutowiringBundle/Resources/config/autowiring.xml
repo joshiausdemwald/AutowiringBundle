@@ -7,6 +7,8 @@
     <parameters>
         <parameter key="autowiring.doc_parser.class">Doctrine\Common\Annotations\DocParser</parameter>
         <parameter key="autowiring.annotation_reader.class">Doctrine\Common\Annotations\AnnotationReader</parameter>
+        <parameter key="autowiring.annotation_cached_reader.class">Doctrine\Common\Annotations\CachedReader</parameter>
+        <parameter key="autowiring.annotation_cache.class">Doctrine\Common\Cache\ArrayCache</parameter>
         <parameter key="autowiring.injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\Injector</parameter>
         <parameter key="autowiring.method_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\MethodInjector</parameter>
         <parameter key="autowiring.property_injector.class">Ifschleife\Bundle\AutowiringBundle\Autowiring\Injector\PropertyInjector</parameter>
@@ -37,8 +39,16 @@
             </call>
         </service>
         
-        <service id="autowiring.annotation_reader" class="%autowiring.annotation_reader.class%" public="false">
-            <property name="parser" type="service" id="autowiring.doc_parser" />
+        <service id="autowiring.annotation_reader" class="%autowiring.annotation_cached_reader.class%" public="false">
+            <argument type="service">
+                <service class="%autowiring.annotation_reader.class%">
+                    <property name="parser" type="service" id="autowiring.doc_parser" />
+                </service>
+            </argument>
+            <argument type="service">
+                <service class="%autowiring.annotation_cache.class%" />
+            </argument>
+            <argument>%kernel.debug%</argument>
         </service>
         
         <service id="autowiring.classname_mapper" class="%autowiring.classname_mapper.class%" public="false">
