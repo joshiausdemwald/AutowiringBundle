@@ -111,8 +111,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         
         $this->assertEquals('Test', $config['property_injection']['service_name_suffix']);
         $this->assertEquals('Test2', $config['property_injection']['parameter_name_suffix']);
+        
         $this->assertFalse($config['constructor_injection']['enabled']);
         $this->assertFalse($config['constructor_injection']['wire_by_type']);
+        
         $this->assertFalse($config['setter_injection']['enabled']);
         $this->assertFalse($config['setter_injection']['wire_by_type']);
     }
