@@ -24,6 +24,11 @@
     <services>
         
         <service id="autowiring.doc_parser" class="%autowiring.doc_parser.class%" public="false">
+            <call method="setImports">
+                <argument type="collection">
+                    <argument key="ignoreannotation">Doctrine\Common\Annotations\Annotation\IgnoreAnnotation</argument>
+                </argument>
+            </call>
             <call method="setIgnoreNotImportedAnnotations">
                 <argument>true</argument>
             </call>
