@@ -34,15 +34,14 @@
             <call method="setIgnoreNotImportedAnnotations">
                 <argument>true</argument>
             </call>
-            <call method="setAutoloadAnnotations">
-                <argument>true</argument>
-            </call>
         </service>
         
         <service id="autowiring.annotation_reader" class="%autowiring.annotation_cached_reader.class%" public="false">
             <argument type="service">
                 <service class="%autowiring.annotation_reader.class%">
-                    <property name="parser" type="service" id="autowiring.doc_parser" />
+                    <call method="setIgnoreNotImportedAnnotations">
+                        <argument>true</argument>
+                    </call>
                 </service>
             </argument>
             <argument type="service">
