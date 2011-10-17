@@ -91,7 +91,6 @@ class AutowiringExtension extends Extension
             {
                 $iterator->append($this->loadPath($parameters['pathname'], $parameters['recursive'], array_key_exists('filename_pattern', $parameters) ? $parameters['filename_pattern'] : null));
             }
-            
             $serviceBuilder->setFiles($iterator);
             $serviceBuilder->build();
         }

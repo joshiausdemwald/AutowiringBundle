@@ -111,7 +111,7 @@ class DependencyResolver
             if(false !== $service_id)
             {
                 $definition = $this->container->getDefinition($service_id);
-
+                
                 $this->extendConstructorInjections($definition, $class);
 
                 $this->extendSetters($definition, $class);
@@ -136,6 +136,7 @@ class DependencyResolver
         {
             $this->constructorInjector->inject($definition, $constructor);
         }
+        
     }
 
     /**
